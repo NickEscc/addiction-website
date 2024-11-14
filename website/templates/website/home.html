@@ -46,10 +46,13 @@
 
         /* Navigation Bar Styling */
         nav {
+            display: flex;
+            justify-content: space-between;  /* Space out the navigation items */
+            align-items: center;
             background-color: #333;
             padding: 10px 20px;  /* Padding to give the navigation some space */
-            width: 100%;  /* Full width of the page */
-            margin-top: 80px;  /* Push down below the title */
+            width: 100%;
+            margin-top: 80px;  /* Space between title and navigation bar */
         }
 
         /* Navigation Link Styling */
@@ -94,21 +97,19 @@
     <!-- Text under the title -->
     <div class="top-left-subtitle">The Ultimate Poker Experience</div>
 
-    <!-- Navigation Links with Sign Up and Login Buttons under the title -->
+    <!-- Navigation Links -->
     <nav>
+        <!-- Left side links (How It Works, How to Play) -->
         <div>
             <a href="how-it-works.html">How It Works</a>
             <a href="how-to-play.html">How to Play</a>
         </div>
-        <!-- Navigation Links (How It Works, How to Play) are on the left -->
 
+        <!-- Right side buttons (Login and Sign Up) -->
         <div>
             <a href="login.html">Login</a>
-            <!-- Login link -->
             <a href="signup.html" class="signup-btn">Sign Up</a>
-            <!-- Sign Up button -->
         </div>
-        <!-- Login and Sign Up buttons are on the right -->
     </nav>
 
     <!-- Centered "Must be 21 to play" text -->
