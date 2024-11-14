@@ -4,19 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
+
+    <style>
+        /* CSS for positioning "Poker Addiction" in the top-left corner */
+        .top-left-title {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFFFFF; /* White text color */
+            background-color: #333333; /* Dark background */
+            padding: 5px 10px; /* Padding for readability */
+            border-radius: 5px; /* Rounded corners */
+        }
+
+        /* Ensure the body has black background with white text */
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0; /* Remove default margin */
+        }
+    </style>
 </head>
 <body>
-    <h1>Addiction Website</h1>
-    <h2>nick</h2>
-</body>
-</html>
-
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}">
-
-<body style="background-color: black; color: white;">
-    <h1>Welcome to My Website</h1>
-    <p>This is a paragraph with white text on a black background.</p>
-</body>
+    <!-- "Poker Addiction" title in the top-left corner -->
+    <div class="top-left-title">Poker Addiction</div>
 
 
