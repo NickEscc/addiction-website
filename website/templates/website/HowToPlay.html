@@ -4,96 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How to Play Poker</title>
+    <!-- Google Font for Better Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
     <style>
         /* General body styling */
         body {
-            background-color: #121212; /* Black background */
+            background: linear-gradient(135deg, #121212 0%, #333333 100%); /* Dark gradient background */
             color: #fff; /* White text for contrast */
-            font-family: 'Arial', sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            line-height: 1.6;
+            line-height: 1.8;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* Header styling */
+        /* Header Styling */
         header {
-            background-color: #1f1f1f; /* Dark gray for header */
-            padding: 20px;
+            background: linear-gradient(135deg, #f8c301 0%, #ff8700 100%); /* Golden gradient for header */
+            padding: 50px 20px;
             text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
         header h1 {
             font-size: 3em;
             margin: 0;
-            color: #f8c301; /* Golden yellow color for contrast */
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3); /* Shadow for text depth */
         }
 
-        /* Main content area */
+        /* Main Content Area */
         main {
-            max-width: 900px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #1d1d1d; /* Slightly lighter gray for content area */
-            border-radius: 8px;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 40px;
+            background-color: #222222;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* Box shadow for depth */
         }
 
         section {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
-        /* Section title */
         h2 {
-            font-size: 1.8em;
-            color: #f8c301; /* Golden yellow */
-            border-bottom: 2px solid #f8c301;
-            padding-bottom: 5px;
+            font-size: 2em;
+            color: #f8c301; /* Golden yellow for emphasis */
+            border-bottom: 3px solid #f8c301;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
 
-        /* Paragraph text */
+        /* Content text */
         p, ul {
             font-size: 1.2em;
-            color: #d1d1d1; /* Light gray for readability */
+            color: #e0e0e0; /* Light gray for readability */
         }
 
         /* List styling */
         ul {
             padding-left: 20px;
+            margin-top: 10px;
         }
 
         li {
-            margin: 5px 0;
+            margin: 12px 0;
+            line-height: 1.6;
         }
 
         li strong {
-            color: #f8c301; /* Golden yellow for emphasis */
+            color: #f8c301; /* Golden for emphasis */
         }
 
-        /* Footer styling */
+        /* Section styling for hover effects */
+        section:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease-out;
+            background-color: #333333;
+        }
+
+        /* Footer Styling */
         footer {
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             background-color: #1f1f1f;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            position: relative;
+            margin-top: 40px;
+            font-size: 1.1em;
             color: #d1d1d1;
         }
 
-        /* Links styling */
+        /* Links Styling */
         a {
             color: #f8c301;
             text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
         }
 
         a:hover {
+            color: #ff8700; /* Slightly different shade for hover effect */
             text-decoration: underline;
         }
+
+        /* Button Styling */
+        .button {
+            display: inline-block;
+            background-color: #f8c301;
+            color: #121212;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            font-weight: 600;
+            text-align: center;
+            text-transform: uppercase;
+            border-radius: 30px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #ff8700;
+            transform: scale(1.05);
+        }
+
     </style>
 </head>
 <body>
+
     <header>
         <h1>How to Play Poker</h1>
     </header>
+
     <main>
         <section>
             <h2>Basics of Poker</h2>
@@ -119,10 +167,13 @@
         <section>
             <h2>Betting Rounds</h2>
             <p>There are four betting rounds in Texas Hold'em: Pre-Flop, Flop, Turn, and River. Players can call, raise, or fold based on their hands and strategies.</p>
+            <a href="#" class="button">Learn More</a>
         </section>
     </main>
+
     <footer>
-        <p>Poker Addiction</p>
+        <p>&copy; 2024 Poker Addiction | All Rights Reserved</p>
     </footer>
+
 </body>
 </html>
