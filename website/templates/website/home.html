@@ -47,7 +47,7 @@
         /* Navigation Bar Styling */
         nav {
             display: flex;
-            justify-content: space-between;  /* Space out the navigation items */
+            justify-content: space-between;  /* Space out the left, center, and right items */
             align-items: center;
             background-color: #333;
             padding: 10px 20px;  /* Padding to give the navigation some space */
@@ -55,7 +55,7 @@
             margin-top: 80px;  /* Space between title and navigation bar */
         }
 
-        /* Navigation Link Styling */
+        /* Left and Right Navigation Links Styling */
         nav a {
             color: white;
             margin: 0 20px;  /* Space out the links */
@@ -65,6 +65,18 @@
 
         nav a:hover {
             color: #FFAA00;  /* Change color on hover */
+        }
+
+        /* Center Navigation Links */
+        .nav-center {
+            display: flex;
+            justify-content: center;
+            flex-grow: 1; /* This ensures it takes up available space between left and right items */
+        }
+
+        /* Center Links Styling */
+        .nav-center a {
+            margin: 0 30px; /* Space out the links in the center */
         }
 
         /* Centered "Must be 21 to play" text */
@@ -99,16 +111,16 @@
 
     <!-- Navigation Links -->
     <nav>
-        <!-- Left side links (How It Works, How to Play) -->
-        <div>
-            <a href="how-it-works.html">How It Works</a>
-            <a href="how-to-play.html">How to Play</a>
-        </div>
-
-        <!-- Right side buttons (Login and Sign Up) -->
+        <!-- Left side links (Login and Sign Up) -->
         <div>
             <a href="login.html">Login</a>
             <a href="signup.html" class="signup-btn">Sign Up</a>
+        </div>
+
+        <!-- Centered links (How It Works, How to Play) -->
+        <div class="nav-center">
+            <a href="how-it-works.html">How It Works</a>
+            <a href="how-to-play.html">How to Play</a>
         </div>
     </nav>
 
