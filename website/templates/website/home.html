@@ -47,10 +47,10 @@
         /* Navigation Bar Styling */
         nav {
             display: flex;
-            justify-content: space-between;  /* Space out the left, center, and right items */
+            justify-content: space-between;  /* Space between all sections */
             align-items: center;
             background-color: #333;
-            padding: 10px 20px;  /* Padding to give the navigation some space */
+            padding: 10px 20px;  /* Padding for spacing in the navbar */
             width: 100%;
             margin-top: 80px;  /* Space between title and navigation bar */
         }
@@ -60,7 +60,7 @@
             color: white;
             margin: 0 20px;  /* Space out the links */
             text-decoration: none;
-            font-size: 18px;  /* Font size for the navigation links */
+            font-size: 18px;  /* Font size for navigation links */
         }
 
         nav a:hover {
@@ -76,14 +76,7 @@
 
         /* Center Links Styling */
         .nav-center a {
-            margin: 0 30px; /* Space out the links in the center */
-        }
-
-        /* Centered "Must be 21 to play" text */
-        .must-be-21 {
-            font-size: 24px;
-            color: #FFAA00;  /* Gold color */
-            margin-top: 50px;  /* Add space below the navigation bar */
+            margin: 0 30px; /* Space out the center links */
         }
 
         /* Sign Up Button Styling */
@@ -99,6 +92,13 @@
         .signup-btn:hover {
             background-color: #FF7F00;  /* Darker gold on hover */
         }
+
+        /* Centered "Must be 21 to play" text */
+        .must-be-21 {
+            font-size: 24px;
+            color: #FFAA00;  /* Gold color */
+            margin-top: 50px;  /* Add space below the navigation bar */
+        }
     </style>
 </head>
 <body>
@@ -111,16 +111,19 @@
 
     <!-- Navigation Links -->
     <nav>
-        <!-- Left side links (Login and Sign Up) -->
-        <div>
-            <a href="login.html">Login</a>
-            <a href="signup.html" class="signup-btn">Sign Up</a>
-        </div>
+        <!-- Left side links (empty as we don't want any on the left) -->
+        <div></div>
 
         <!-- Centered links (How It Works, How to Play) -->
         <div class="nav-center">
             <a href="how-it-works.html">How It Works</a>
             <a href="how-to-play.html">How to Play</a>
+        </div>
+
+        <!-- Right side links (Login and Sign Up) -->
+        <div>
+            <a href="login.html">Login</a>
+            <a href="signup.html" class="signup-btn">Sign Up</a>
         </div>
     </nav>
 
