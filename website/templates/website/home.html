@@ -5,91 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poker Addiction - Home</title>
 
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}">
-
     <style>
-        /* Body Styling */
+        /* General Body Styling */
         body {
             background-color: black;
             color: white;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-
-        /* Title in the top-left corner */
-        .top-left-title {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #FFFFFF;
-            background-color: #333333;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        /* Text below the title */
-        .top-left-subtitle {
-            position: absolute;
-            top: 40px;
-            left: 10px;
-            font-size: 16px;
-            color: #FFFFFF;
-            background-color: #333333;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        /* General Section Styling */
-        .section {
-            padding: 40px;
-            margin: 20px;
-            background-color: #222222;
-            border-radius: 8px;
-        }
-
-        .section h2 {
-            color: #FFAA00; /* Gold color for headings */
-        }
-
-        /* Navigation Links (optional) */
-        nav {
-            background-color: #333;
-            padding: 10px 0;
             text-align: center;
         }
 
-        nav a {
-            color: white;
-            margin: 0 20px;
-            text-decoration: none;
-            font-size: 18px;
+        /* Poker Table Container */
+        .table-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 100px auto;
+            background-color: #2a5b34; /* Green poker table color */
+            border-radius: 50%; /* Make the table circular */
+            border: 3px solid #fff; /* White border for the table */
+            animation: rotateTable 6s infinite linear; /* Table rotation animation */
         }
 
-        nav a:hover {
-            color: #FFAA00;
+        /* Rotate Table Animation */
+        @keyframes rotateTable {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
+
+        /* Poker Chip Styling */
+        .chip {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #FFD700; /* Gold color for poker chips */
+            border-radius: 50%; /* Make the chip circular */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: moveChip 5s infinite alternate; /* Animation for chip movement */
+        }
+
+        /* Move Poker Chip Animation */
+        @keyframes moveChip {
+            0% {
+                top: 50%;
+                left: 50%;
+            }
+            25% {
+                top: 20%;
+                left: 20%;
+            }
+            50% {
+                top: 50%;
+                left: 80%;
+            }
+            75% {
+                top: 80%;
+                left: 50%;
+            }
+            100% {
+                top: 20%;
+                left: 80%;
+            }
+        }
+
+        /* Poker Table Header */
+        h1 {
+            color: #FFD700; /* Gold color for title */
+            font-size: 40px;
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
 
-    <!-- "Poker Addiction" title in the top-left corner -->
-    <div class="top-left-title">Poker Addiction</div>
-
-    <!-- Text under the title -->
-    <div class="top-left-subtitle">The Ultimate Poker Experience</div>
-
-    <!-- Navigation Links -->
-    <nav>
-        <a href="how-it-works.html">How It Works</a>
-        <a href="how-to-play.html">How to Play</a>
-        <a href="login.html">Login</a>
-    </nav>
+    <!-- Poker Table -->
+    <h1>Poker Addiction</h1>
+    <div class="table-container">
+        <div class="chip"></div> <!-- Poker Chip -->
+    </div>
 
 </body>
 </html>
-
-
