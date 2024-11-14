@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>Poker Addiction - Home</title>
 
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}">
@@ -55,22 +55,6 @@
             color: #FFAA00; /* Gold color for headings */
         }
 
-        /* Login Button */
-        .login-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #FFAA00;
-            color: black;
-            font-size: 18px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            background-color: #FF8800;
-        }
-
         /* Navigation Links (optional) */
         nav {
             background-color: #333;
@@ -100,41 +84,10 @@
 
     <!-- Navigation Links -->
     <nav>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#how-to-play">How to Play</a>
-        <a href="#login">Login</a>
+        <a href="how-it-works.html">How It Works</a>
+        <a href="how-to-play.html">How to Play</a>
+        <a href="login.html">Login</a>
     </nav>
-
-    <!-- How It Works Section -->
-    <div id="how-it-works" class="section">
-        <h2>How It Works</h2>
-        <p>Our poker platform is designed for players of all skill levels. You can join games, play tournaments, and challenge others while improving your poker strategies.</p>
-        <p>Here’s how to get started:</p>
-        <ul>
-            <li>Create an account or log in.</li>
-            <li>Select a game or tournament to join.</li>
-            <li>Start playing and enjoy the thrill of poker!</li>
-        </ul>
-    </div>
-
-    <!-- How to Play Section -->
-    <div id="how-to-play" class="section">
-        <h2>How to Play</h2>
-        <p>In poker, the objective is to make the best hand possible using a combination of cards. Here are some basic steps:</p>
-        <ol>
-            <li>Each player is dealt two private cards (known as hole cards).</li>
-            <li>The dealer places five community cards on the table (called the "board").</li>
-            <li>Players can use these cards to create the best five-card hand.</li>
-            <li>The player with the best hand at the end of the round wins the pot.</li>
-        </ol>
-    </div>
-
-    <!-- Login Section -->
-    <div id="login" class="section">
-        <h2>Login</h2>
-        <p>If you already have an account, log in below:</p>
-        <a href="login.html" class="login-btn">Login Now</a>
-    </div>
 
 </body>
 </html>
