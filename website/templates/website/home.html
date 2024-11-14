@@ -2,171 +2,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Set character encoding to UTF-8 for proper text rendering -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Ensure the page is responsive on different screen sizes -->
     <title>Poker Addiction - Home</title>
-    <!-- Title of the webpage that appears in the browser tab -->
 
-    {% load static %}
-    <!-- Django tag to load static files, used for linking stylesheets, images, etc. -->
-
+    <!-- Static stylesheet link -->
     <link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}">
-    <!-- Link to an external CSS file for additional styles (if needed) -->
 
     <style>
         /* Body Styling */
         body {
             background-color: black;
-            /* Set the background color of the page to black */
             color: white;
-            /* Set the text color to white for contrast */
             font-family: Arial, sans-serif;
-            /* Use Arial font for text */
             margin: 0;
             padding: 0;
-            /* Remove default margin and padding */
             display: flex;
-            /* Use Flexbox to position elements */
             flex-direction: column;
-            /* Stack the children elements vertically */
             align-items: center;
-            /* Center align the children horizontally */
             justify-content: center;
-            /* Center align the children vertically */
             height: 100vh;
-            /* Set the height to 100% of the viewport height */
             text-align: center;
-            /* Center the text inside the body */
         }
 
         /* Title in the top-left corner */
         .top-left-title {
             position: absolute;
-            /* Position the element absolutely within the body */
             top: 10px;
-            /* 10px from the top of the page */
             left: 10px;
-            /* 10px from the left of the page */
             font-size: 24px;
-            /* Set the font size of the title */
             font-weight: bold;
-            /* Make the title bold */
             color: #FFFFFF;
-            /* Set the text color to white */
             background-color: #333333;
-            /* Set a dark gray background color */
             padding: 5px 10px;
-            /* Add padding around the text */
             border-radius: 5px;
-            /* Round the corners of the background */
         }
 
         /* Text below the title */
         .top-left-subtitle {
             position: absolute;
-            /* Position the subtitle absolutely */
             top: 40px;
-            /* 40px from the top of the page */
             left: 10px;
-            /* 10px from the left of the page */
             font-size: 14px;
-            /* Set a smaller font size for the subtitle */
             color: #FFFFFF;
-            /* Set the text color to white */
             background-color: #333333;
-            /* Set the background color to match the title */
             padding: 5px 10px;
-            /* Add padding around the text */
             border-radius: 5px;
-            /* Round the corners of the background */
         }
 
-        /* General Section Styling */
-        .section {
-            padding: 40px;
-            /* Add padding inside the section */
-            margin: 20px;
-            /* Add margin outside the section */
-            background-color: #222222;
-            /* Set a darker background color for the section */
-            border-radius: 8px;
-            /* Round the corners of the section */
-        }
-
-        .section h2 {
-            color: #FFAA00;
-            /* Set the color of the heading to gold */
-        }
-
-        /* Navigation Links Styling */
+        /* Navigation Bar Styling */
         nav {
+            display: flex;
+            justify-content: space-between;  /* Space out the items to the far left and right */
+            align-items: center;
             background-color: #333;
-            /* Set a dark background color for the navigation bar */
-            padding: 10px 0;
-            /* Add padding above and below the navigation */
-            width: 100%;
-            /* Set the width of the navigation bar to take up the full width of the page */
-            text-align: center;
-            /* Center the text inside the navigation */
-            margin-top: 20px;
-            /* Add margin at the top of the navigation bar */
+            padding: 10px 20px;  /* Padding to give the navigation some space */
+            width: 100%;  /* Full width of the page */
         }
 
+        /* Navigation Link Styling */
         nav a {
             color: white;
-            /* Set the text color to white for the links */
-            margin: 0 20px;
-            /* Add horizontal margin between the links */
+            margin: 0 20px;  /* Space out the links */
             text-decoration: none;
-            /* Remove the underline from the links */
-            font-size: 18px;
-            /* Set the font size for the navigation links */
+            font-size: 18px;  /* Font size for the navigation links */
         }
 
         nav a:hover {
-            color: #FFAA00;
-            /* Change the color to gold when hovering over the links */
+            color: #FFAA00;  /* Change color on hover */
         }
 
         /* Centered "Must be 21 to play" text */
         .must-be-21 {
             font-size: 24px;
-            /* Set the font size to make the text more prominent */
-            color: #FFAA00;
-            /* Set the text color to gold */
+            color: #FFAA00;  /* Gold color */
             margin-top: 50px;
-            /* Add margin at the top to separate it from other content */
         }
 
+        /* Sign Up Button Styling */
+        .signup-btn {
+            background-color: #FFAA00;
+            color: black;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signup-btn:hover {
+            background-color: #FF7F00;  /* Darker gold on hover */
+        }
     </style>
 </head>
 <body>
 
     <!-- "Poker Addiction" title in the top-left corner -->
     <div class="top-left-title">Poker Addiction</div>
-    <!-- This is the main title displayed in the top-left corner of the page -->
 
     <!-- Text under the title -->
     <div class="top-left-subtitle">The Ultimate Poker Experience</div>
-    <!-- This is the subtitle under the main title, providing more context -->
 
-    <!-- Navigation Links -->
+    <!-- Navigation Links with Sign Up and Login Buttons -->
     <nav>
-        <!-- Navigation bar that links to other pages on the website -->
-        <a href="how-it-works.html">How It Works</a>
-        <!-- Link to the "How It Works" page -->
-        <a href="how-to-play.html">How to Play</a>
-        <!-- Link to the "How to Play" page -->
-        <a href="login.html">Login</a>
-        <!-- Link to the "Login" page -->
+        <div>
+            <a href="how-it-works.html">How It Works</a>
+            <a href="how-to-play.html">How to Play</a>
+        </div>
+        <!-- Navigation Links (How It Works, How to Play) are on the left -->
+
+        <div>
+            <a href="login.html">Login</a>
+            <!-- Login link -->
+            <a href="signup.html" class="signup-btn">Sign Up</a>
+            <!-- Sign Up button -->
+        </div>
+        <!-- Login and Sign Up buttons are on the right -->
     </nav>
 
     <!-- Centered "Must be 21 to play" text -->
     <div class="must-be-21">
         Must be 21 to play
     </div>
-    <!-- This text is centered in the middle of the page to emphasize the age restriction -->
 
 </body>
 </html>
