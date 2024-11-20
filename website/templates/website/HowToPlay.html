@@ -60,16 +60,9 @@
             font-weight: 600;
         }
 
-        /* Hand Rankings Styling with Images */
+        /* Hand Rankings Styling */
         .hand-ranking {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: space-between;
-        }
-
-        .hand-ranking div {
-            flex-basis: 48%;
+            display: none;
             padding: 20px;
             background: #333;
             border-radius: 10px;
@@ -86,11 +79,31 @@
             margin: 0 0 10px 0;
         }
 
-        /* Add animations for interactive elements */
-        .hand-ranking div:hover {
-            transform: scale(1.05);
-            transition: transform 0.3s ease-out;
+        /* Arrow Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            background-color: #f8c301;
+            color: #121212;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background-color: #ff8700;
+        }
+
+        .nav-button:disabled {
             background-color: #444;
+            cursor: not-allowed;
         }
 
         /* Footer Styling */
@@ -104,40 +117,6 @@
             color: #d1d1d1;
         }
 
-        /* Links Styling */
-        a {
-            color: #f8c301;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        a:hover {
-            color: #ff8700;
-            text-decoration: underline;
-        }
-
-        /* Example Button */
-        .button {
-            display: inline-block;
-            background-color: #f8c301;
-            color: #121212;
-            padding: 12px 30px;
-            font-size: 1.2em;
-            font-weight: 600;
-            text-align: center;
-            text-transform: uppercase;
-            border-radius: 30px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            text-decoration: none;
-            margin-top: 20px;
-        }
-
-        .button:hover {
-            background-color: #ff8700;
-            transform: scale(1.05);
-        }
-
     </style>
 </head>
 <body>
@@ -148,50 +127,80 @@
 
     <main>
         <section>
-            <h2>Basics of Poker</h2>
-            <p>Poker is a game of skill, strategy, and luck. The goal is to win chips by creating the best hand or convincing your opponents to fold.</p>
-        </section>
-
-        <section>
             <h2>Hand Rankings</h2>
-            <div class="hand-ranking">
-                <div>
-                    <h3>Royal Flush</h3>
-                    <img src="images/royal_flush.png" alt="Royal Flush">
-                    <p>A, K, Q, J, 10, all of the same suit.</p>
-                </div>
-                <div>
-                    <h3>Straight Flush</h3>
-                    <img src="images/straight_flush.png" alt="Straight Flush">
-                    <p>Five consecutive cards of the same suit.</p>
-                </div>
-                <div>
-                    <h3>Four of a Kind</h3>
-                    <img src="images/four_of_a_kind.png" alt="Four of a Kind">
-                    <p>Four cards of the same rank.</p>
-                </div>
-                <div>
-                    <h3>Full House</h3>
-                    <img src="images/full_house.png" alt="Full House">
-                    <p>Three of a kind and a pair.</p>
-                </div>
+
+            <!-- Hand Rankings Section with Initial Display of First Hand -->
+            <div id="royal-flush" class="hand-ranking">
+                <h3>Royal Flush</h3>
+                <img src="images/royal_flush.png" alt="Royal Flush">
+                <p>A, K, Q, J, 10, all of the same suit.</p>
             </div>
-        </section>
+            <div id="straight-flush" class="hand-ranking">
+                <h3>Straight Flush</h3>
+                <img src="images/straight_flush.png" alt="Straight Flush">
+                <p>Five consecutive cards of the same suit.</p>
+            </div>
+            <div id="four-of-a-kind" class="hand-ranking">
+                <h3>Four of a Kind</h3>
+                <img src="images/four_of_a_kind.png" alt="Four of a Kind">
+                <p>Four cards of the same rank.</p>
+            </div>
+            <div id="full-house" class="hand-ranking">
+                <h3>Full House</h3>
+                <img src="images/full_house.png" alt="Full House">
+                <p>Three of a kind and a pair.</p>
+            </div>
 
-        <section>
-            <h2>Gameplay</h2>
-            <p>In each round, players are dealt two cards, and five community cards are placed on the table. Players use these cards to make the best possible five-card hand.</p>
-        </section>
-
-        <section>
-            <h2>Betting Rounds</h2>
-            <p>There are four betting rounds in Texas Hold'em: Pre-Flop, Flop, Turn, and River. Players can call, raise, or fold based on their hands and strategies.</p>
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons">
+                <button id="prev-btn" class="nav-button" disabled>Back</button>
+                <button id="next-btn" class="nav-button">Next</button>
+            </div>
         </section>
     </main>
 
     <footer>
         <p>&copy; 2024 Poker Addiction | All Rights Reserved</p>
     </footer>
+
+    <script>
+        // JavaScript to control the Hand Rankings navigation
+        let currentIndex = 0;
+        const rankings = document.querySelectorAll('.hand-ranking');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Function to show the current ranking
+        function showRanking(index) {
+            // Hide all rankings
+            rankings.forEach(ranking => ranking.style.display = 'none');
+            
+            // Show the current ranking
+            rankings[index].style.display = 'block';
+            
+            // Update button states
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === rankings.length - 1;
+        }
+
+        // Show the first ranking on page load
+        showRanking(currentIndex);
+
+        // Event listeners for navigation buttons
+        prevBtn.addEventListener('click', function() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showRanking(currentIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', function() {
+            if (currentIndex < rankings.length - 1) {
+                currentIndex++;
+                showRanking(currentIndex);
+            }
+        });
+    </script>
 
 </body>
 </html>
