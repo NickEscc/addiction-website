@@ -60,6 +60,21 @@
             font-weight: 600;
         }
 
+        p, ul {
+            font-size: 1.2em;
+            color: #e0e0e0;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+
         /* Hand Rankings Styling */
         .hand-ranking {
             display: none;
@@ -126,10 +141,23 @@
     </header>
 
     <main>
+        <!-- Introduction Section -->
+        <section>
+            <h2>Introduction to Poker</h2>
+            <p>Poker is a popular card game that combines skill, strategy, and luck. The objective of the game is to form the best possible five-card hand from the cards dealt to you and the community cards available. Players bet chips based on the strength of their hands, and the one with the best hand or the last person standing wins the pot.</p>
+        </section>
+
+        <!-- How the Game Works Section -->
+        <section>
+            <h2>How the Game Works</h2>
+            <p>In poker, each player is dealt two private cards (known as hole cards) and can use five community cards placed face-up on the table. The objective is to make the best possible five-card hand using any combination of the seven available cards. Players can bet, raise, fold, or check depending on the round.</p>
+        </section>
+
+        <!-- Hand Rankings Section -->
         <section>
             <h2>Hand Rankings</h2>
 
-            <!-- Hand Rankings Section with Initial Display of First Hand -->
+            <!-- Hand Rankings Content -->
             <div id="royal-flush" class="hand-ranking">
                 <h3>Royal Flush</h3>
                 <img src="images/royal_flush.png" alt="Royal Flush">
@@ -156,6 +184,23 @@
                 <button id="prev-btn" class="nav-button" disabled>Back</button>
                 <button id="next-btn" class="nav-button">Next</button>
             </div>
+        </section>
+
+        <!-- Betting Rounds Section -->
+        <section>
+            <h2>Betting Rounds</h2>
+            <p>There are four betting rounds in Texas Hold'em: Pre-Flop, Flop, Turn, and River. In each round, players have the option to bet, check, raise, or fold based on their cards and the community cards. The betting rounds provide players the opportunity to evaluate their hands and adjust their strategy accordingly.</p>
+        </section>
+
+        <!-- Poker Tips Section -->
+        <section>
+            <h2>Poker Tips</h2>
+            <ul>
+                <li><strong>Pay attention to your opponents:</strong> Watching how others play can give you insight into their strategy.</li>
+                <li><strong>Don’t play too many hands:</strong> Be selective with the hands you play to avoid losing chips unnecessarily.</li>
+                <li><strong>Know when to fold:</strong> Don’t be afraid to fold a hand if you think you’re beaten.</li>
+                <li><strong>Use position to your advantage:</strong> Players acting later in the betting rounds have more information to make decisions.</li>
+            </ul>
         </section>
     </main>
 
@@ -187,20 +232,4 @@
         showRanking(currentIndex);
 
         // Event listeners for navigation buttons
-        prevBtn.addEventListener('click', function() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                showRanking(currentIndex);
-            }
-        });
-
-        nextBtn.addEventListener('click', function() {
-            if (currentIndex < rankings.length - 1) {
-                currentIndex++;
-                showRanking(currentIndex);
-            }
-        });
-    </script>
-
-</body>
-</html>
+        prevBtn
