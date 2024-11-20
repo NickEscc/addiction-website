@@ -3,17 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>Poker Addiction - Home</title>
+
+    <!-- Static stylesheet link -->
+    <link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}">
+
+    <style>
+        /* Body Styling */
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        /* Title in the top-left corner */
+        .top-left-title {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFFFFF;
+            background-color: #333333;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        /* Text below the title */
+        .top-left-subtitle {
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            font-size: 14px;
+            color: #FFFFFF;
+            background-color: #333333;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        /* Navigation Bar Styling */
+        nav {
+            display: flex;
+            justify-content: space-between;  /* Space between all sections */
+            align-items: center;
+            background-color: #333;
+            padding: 10px 20px;  /* Padding for spacing in the navbar */
+            width: 100%;
+            margin-top: 80px;  /* Space between title and navigation bar */
+        }
+
+        /* Left and Right Navigation Links Styling */
+        nav a {
+            color: white;
+            margin: 0 20px;  /* Space out the links */
+            text-decoration: none;
+            font-size: 18px;  /* Font size for navigation links */
+        }
+
+        nav a:hover {
+            color: #FFAA00;  /* Change color on hover */
+        }
+
+        /* Center Navigation Links */
+        .nav-center {
+            display: flex;
+            justify-content: center;
+            flex-grow: 1; /* This ensures it takes up available space between left and right items */
+        }
+
+        /* Center Links Styling */
+        .nav-center a {
+            margin: 0 30px; /* Space out the center links */
+        }
+
+        /* Sign Up Button Styling */
+        .signup-btn {
+            background-color: #FFAA00;
+            color: black;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signup-btn:hover {
+            background-color: #FF7F00;  /* Darker gold on hover */
+        }
+
+        /* Centered "Must be 21 to play" text */
+        .must-be-21 {
+            font-size: 24px;
+            color: #FFAA00;  /* Gold color */
+            margin-top: 50px;  /* Add space below the navigation bar */
+        }
+    </style>
 </head>
-<button>Login</button>
-</html>
-
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}">
-
-<body style="background-color: black; color: white;">
-    <h1>Welcome to My Website</h1>
-    <p>This is a paragraph with white text on a black background.</p>
+<body>
+    <h1>Addiction Website</h1>
+    <h2>nick</h2>
 </body>
-
-
+</html>
