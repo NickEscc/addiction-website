@@ -6,3 +6,6 @@ def home(request):
 
 def HowToPlay(request):
     return render(request, 'website/HowToPlay.html')
+
+def HowItWorks(request):
+    return render(request, 'website/HowItWorks.html')
