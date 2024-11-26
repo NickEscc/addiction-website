@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  traditional:
+    build: .
+    command: python website/Services/traditional_poker_service.py
+    ports:
+      - "${Traditional_Port}:8005"  # Map host port (from .env) to container port 8005
+    environment:
+      Traditional_Port: 8005
+    env_file:
+      - .env
+  websock:
+    build: .
+    command: python website/websocket_server.py
+    ports:
+      - "${Web_Port}:8005"  # Map host port (from .env) to container port 8005
+    environment:
+      Web_Port: 8005
+    env_file:
+      - .env
+
+  # gameserver:
+  #   build: .
+  #   command: python website/Services/Logic/game_server_redis.py
+  #   ports:
+  #     - "${GameServer_Port}:8002"  # Map host port (from .env) to container port 8002
+  #   environment:
+  #     GameServer_Port: 8002
+  #   env_file:
+  #     - .env
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"  # Redis default port
+  #   restart: always
+
+
+  texas:
+    build: .
+    command: python website/Services/texasholdem_poker_service.py
+    ports:
+      - "${Texas_Port}:8005"  # Map host port (from .env) to container port 8005
+    environment:
+      Texas_Port: 8005
+    env_file:
+      - .env

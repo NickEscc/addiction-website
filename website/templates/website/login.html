@@ -1,0 +1,23 @@
+{% include "home.html" %}
+<div class="container">
+    {% load static %}
+    <main id="main">
+        <h1>Welcome to Addiction!</h1>
+
+        <form action="{% url 'join' %}" method="post">
+            {% csrf_token %}
+            <div id="login-bar">
+                <div class="form-group">
+                    <input type="text" class="form-control input-lg" name="name" placeholder="Your name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control input-lg" name="room-id" placeholder="Room id (optional)">
+                    <small class="form-text text-muted">Leave this blank to join any room available</small>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-lg login-link" type="submit">Start playing</button>
+                </div>
+            </div>
+        </form>
+    </main>
+</div>
