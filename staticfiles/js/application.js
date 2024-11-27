@@ -555,17 +555,12 @@ PyPoker = {
         let wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
         let connectionChannel = encodeURIComponent("texas-holdem");
 
-        PyPoker.socket = new WebSocket(
-        wsScheme + location.host + "/ws/Services/" + connectionChannel + "/"
-        );
-
-
         console.log("Initializing WebSocket connection...");
 
-        // let wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
         PyPoker.socket = new WebSocket(
-            wsScheme + location.host + "/ws/Services/texas-holdem/"
-                );
+            wsScheme + location.host + "/ws/Services/" + connectionChannel + "/"
+        );
+
 
         PyPoker.socket.onopen = function() {
             console.log('WebSocket connected');

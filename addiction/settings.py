@@ -41,15 +41,29 @@ INSTALLED_APPS = [
     'channels',
     'website',
 ]
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             'hosts': [('localhost', 6379)],  # Update if your Redis settings are different
+#         },
+#     },
+# }
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#     },
+# }
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('localhost', 6379)],  # Update if your Redis settings are different
+            'hosts': [('127.0.0.1', 6379)],
         },
     },
 }
-ASGI_APPLICATION = 'addiction.asgi.application'
+
+ASGI_APPLICATION = 'addiction.routing.application'
 
 
 
@@ -93,6 +107,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+LOGIN_REDIRECT_URL = 'game' 
 
 
 # Password validation
@@ -136,9 +151,14 @@ STATIC_URL = '/static/'  # URL path for static files
 # STATICFILES_DIRS = [
 #     BASE_DIR / "static",  # Optional: Custom static directory outside apps
 # ]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Directory where collectstatic will place all static files
-STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [
+    BASE_DIR / "website" / "static",  # Adjust to match your directory structure
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

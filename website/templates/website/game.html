@@ -1,57 +1,74 @@
+<!-- game.html -->
+{% extends 'index.html' %}
 
-{% load static %}
-<div class="container" id="game-wrapper">
-    <div class="row">
-        <div id="table-wrapper" class="col-sm-8">
-            <div id="players"></div>
+{% comment %} website/templates/website/game.html {% endcomment %}
 
-            <div id="table">
-                <div class="game-info">
-                    <div id="pots"></div>
-                    <div id="shared-cards"></div>
-                </div>
-            </div>
-        </div>
+{% block content %}
+    <div class="container">
+        <main id="main">
+            <!-- Injecting player and room variables for JavaScript -->
+            <script type="text/javascript">
+                var playerId = "{{ player_id|escapejs }}";
+                var playerName = "{{ player_name|escapejs }}";
+                var playerMoney = {{ player_money|default:0 }};
+                var roomId = "{{ room_id|escapejs }}";
+            </script>
 
-        <div id="current-player-wrapper" class="col-sm-4">
-            <h4>Hi {{player_name}}!</h4>
+            <h1 style="text-align: center;">Poker Game - Room: {{ room_id }}</h1>
 
-            <div id="game-status" class="hidden">
-                <p data-key="4"></p>
-                <p data-key="3"></p>
-                <p data-key="2"></p>
-                <p data-key="1"></p>
-                <p data-key="0"></p>
-            </div>
-
-            <p>Enjoy your poker game :)</p>
-
-            <div id="current-player" class="player">
-                <div class="cards"></div>
-
-                <div id="player-controls">
-                    <div id="bet-controls" class="controls">
-                        <div id="fold-cmd-wrapper">
-                            <input type="button" id="fold-cmd" class="btn btn-danger" value="Fold" />
-                        </div>
-                        <div id="bet-input-wrapper">
-                            <input id="bet-input" type="hidden" class="slider"
-                                   data-slider-id="bet-input"
-                                   data-slider-step="1"/>
-                        </div>
-                        <div id="bet-cmd-wrapper">
-                            <input type="button" id="bet-cmd" class="btn btn-primary" value="Check" />
-                        </div>
-                        <div id="no-bet-cmd-wrapper">
-                            <input type="button" id="no-bet-cmd" class="btn btn-warning" value="Unable to open" />
+            <div id="game-wrapper">
+                <div class="row">
+                    <!-- Players and Table Section -->
+                    <div id="table-wrapper" class="col-sm-8">
+                        <div id="players"></div>
+                        <div id="table">
+                            <div class="game-info">
+                                <div id="pots"></div>
+                                <div id="shared-cards"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="cards-change-controls" class="controls">
-                        <span id="cards-change-cmd" class="btn btn-primary">Change cards</span>
+                    <!-- Current Player Section -->
+                    <div id="current-player-wrapper" class="col-sm-4">
+                        <h4>Welcome, {{ player_name }}!</h4>
+
+                        <!-- Game Status -->
+                        <div id="game-status">
+                            <p data-key="4"></p>
+                            <p data-key="3"></p>
+                            <p data-key="2"></p>
+                            <p data-key="1"></p>
+                            <p data-key="0"></p>
+                        </div>
+
+                        <p>Enjoy your poker game :)</p>
+
+                        <!-- Current Player Details -->
+                        <div id="current-player" class="player">
+                            <div class="cards"></div>
+                            <div id="player-controls">
+                                <!-- Betting Controls -->
+                                <div id="bet-controls" class="controls">
+                                    <div id="fold-cmd-wrapper">
+                                        <button id="fold-cmd" class="btn btn-danger">Fold</button>
+                                    </div>
+                                    <div id="bet-cmd-wrapper">
+                                        <button id="bet-cmd" class="btn btn-primary">Bet</button>
+                                    </div>
+                                    <div id="no-bet-cmd-wrapper">
+                                        <button id="no-bet-cmd" class="btn btn-warning">No Bet</button>
+                                    </div>
+                                </div>
+                                <!-- Card Change Controls -->
+                                <div id="cards-change-controls" class="controls">
+                                    <button id="cards-change-cmd" class="btn btn-primary">Change Cards</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
-</div>
+{% endblock %}
