@@ -1,14 +1,6 @@
 // website/static/js/application.js
 
-if (typeof window === "undefined") {
-    const jsdom = require("jsdom");
-    const { JSDOM } = jsdom;
-    const { window } = new JSDOM("<!DOCTYPE html><p>Hello world</p>");
-    const $ = require("jquery")(window);
 
-    // Make `$` globally available
-    global.$ = $;
-}
 PyPoker = {
 
 
@@ -30,18 +22,21 @@ PyPoker = {
                 x = 0;
                 y = 0;
 
+                var staticUrl = window.staticUrl || '/static/';
+
                 if ($(this).hasClass('small')) {
-                    url = "static/images/cards-small.png";
+
+                    url = staticUrl+ "images/cards-small.png";
                     width = 24;
                     height = 40;
                 }
                 else if ($(this).hasClass('medium')) {
-                    url = "static/images/cards-medium.png";
+                    url = staticUrl + "images/cards-medium.png";
                     width = 45;
                     height = 75;
                 }
                 else {
-                    url = "static/images/cards-large.png";
+                    url =staticUrl + "images/cards-large.png";
                     width = 75;
                     height = 125;
                 }
@@ -457,35 +452,74 @@ PyPoker = {
         roomId: null,
 
         createPlayer: function(player=undefined) {
-            if (player === undefined) {
-                return $('<div class="player"><div class="player-info"></div></div>');
+            var $playerInfo = $('<div class="player-info"></div>');
+            var $player = $('<div class="player"></div>');
+        
+            if (player) {
+                var isCurrentPlayer = player.id == $('#current-player').attr('data-player-id');
+        
+                var $playerName = $('<p class="player-name"></p>');
+                $playerName.text(isCurrentPlayer ? 'You' : player.name);
+        
+                var $playerMoney = $('<p class="player-money"></p>');
+                $playerMoney.text('$' + parseInt(player.money));
+        
+                $playerInfo.append($playerName);
+                $playerInfo.append($playerMoney);
+        
+                if (isCurrentPlayer) {
+                    $player.addClass('current');
+                }
+        
+                $player.attr('data-player-id', player.id);
+            } else {
+                // Empty seat
+                $playerInfo.text('Empty Seat');
             }
-            isCurrentPlayer = player.id == $('#current-player').attr('data-player-id');
-
-            $playerName = $('<p class="player-name"></p>');
-            $playerName.text(isCurrentPlayer ? 'You' : player.name);
-
-            $playerMoney = $('<p class="player-money"></p>');
-            $playerMoney.text('$' + parseInt(player.money));
-
-            $playerInfo = $('<div class="player-info"></div>');
-            $playerInfo.append($playerName);
-            $playerInfo.append($playerMoney);
-
-            $player = $('<div class="player' + (isCurrentPlayer ? ' current' : '') + '"></div>');
-            $player.attr('data-player-id', player.id);
+        
             $player.append($playerInfo);
             $player.append($('<div class="bet-wrapper"></div>'));
             $player.append($('<div class="cards"></div>'));
             $player.append($('<div class="timer"></div>'));
-
+        
             return $player;
+            // if (player === undefined) {
+            //     return $('<div class="player"><div class="player-info"></div></div>');
+            // }
+            // var isCurrentPlayer = player.id == $('#current-player').attr('data-player-id');
+
+            // var $playerName = $('<p class="player-name"></p>');
+            // $playerName.text(isCurrentPlayer ? 'You' : player.name);
+
+            // var $playerMoney = $('<p class="player-money"></p>');
+            // $playerMoney.text('$' + parseInt(player.money));
+
+            // var $playerInfo = $('<div class="player-info"></div>');
+            // $playerInfo.append($playerName);
+            // $playerInfo.append($playerMoney);
+
+            // var $player = $('<div class="player' + (isCurrentPlayer ? ' current' : '') + '"></div>');
+            // $player.attr('data-player-id', player.id);
+            // $player.append($playerInfo);
+            // $player.append($('<div class="bet-wrapper"></div>'));
+            // $player.append($('<div class="cards"></div>'));
+            // $player.append($('<div class="timer"></div>'));
+
+            // return $player;
         },
 
         destroyRoom: function() {
             PyPoker.Game.gameOver();
             PyPoker.Room.roomId = null;
             $('#players').empty();
+        },
+
+        onPlayerRemoved: function(message) {
+            var playerId = message.player_id;
+            // Remove the player element from the DOM
+            $('#players .player[data-player-id="' + playerId + '"]').remove();
+        
+            PyPoker.Logger.log("Player removed: " + playerId);
         },
 
         initRoom: function(message) {
@@ -500,7 +534,8 @@ PyPoker = {
 
                 if (playerId) {
                     // This seat is taken
-                    $seat.append(PyPoker.Room.createPlayer(message.players[playerId]));
+                    var player = message.players[playerId];
+                    $seat.append(PyPoker.Room.createPlayer(player));
                     $seat.attr('data-player-id', playerId);
                 }
                 else {
@@ -511,26 +546,59 @@ PyPoker = {
             }
         },
 
+        onPlayerAdded: function(message) {
+            var player = {
+                id: message.player_id,
+                name: message.player_name,
+                money: message.player_money
+            };
+            var $playerElement = PyPoker.Room.createPlayer(player);
+            $('#players').append($playerElement);
+        
+            PyPoker.Logger.log("Player added: " + player.name);
+        },
+
+        initRoom: function(message) {
+            // Clear existing players
+            $('#players').empty();
+        
+            var players = message.players;
+        
+            // Iterate over the players and add them to the room
+            players.forEach(function(player) {
+                var $playerElement = PyPoker.Room.createPlayer({
+                    id: player.player_id,
+                    name: player.player_name,
+                    money: player.player_money
+                });
+                $('#players').append($playerElement);
+            });
+        },
+        
+
         onRoomUpdate: function(message) {
-            if (PyPoker.Room.roomId == null) {
+            if (message.event == 'initial') {
                 PyPoker.Room.initRoom(message);
+            }else{
+
             }
 
             switch (message.event) {
                 case 'player-added':
-                    playerId = message.player_id;
-                    player = message.players[playerId]
+                    var playerId = message.player_id;
+                    var player = message.players[playerId]
                     playerName = playerId == $('#current-player').attr('data-player-id') ? 'You' : player.name;
                     // Go through every available seat, find the one where the new player should sat and seated him
                     $('.seat').each(function() {
-                        seat = $(this).attr('data-key');
+                        var seat = $(this).attr('data-key');
                         if (message.player_ids[seat] == playerId) {
                             $(this).empty();
                             $(this).append(PyPoker.Room.createPlayer(player));
                             $(this).attr('data-player-id', playerId);
-                            return;
+                            return false;
                         }
                     });
+                    PyPoker.Logger.log("Player added: " + player.name);
                     break;
 
                 case 'player-removed':
@@ -538,14 +606,15 @@ PyPoker = {
                     playerName = $('.player[data-player-id=' + playerId + '] .player-name').text();
                     // Go through every available seat, find the one where the leaving player sat and kick him out
                     $('.seat').each(function() {
-                        seatedPlayerId = $(this).attr('data-player-id');
+                        var seatedPlayerId = $(this).attr('data-player-id');
                         if (seatedPlayerId == playerId) {
                             $(this).empty();
                             $(this).append(PyPoker.Room.createPlayer());
                             $(this).attr('data-player-id', null);
-                            return;
+                            return false;
                         }
                     });
+                    PyPoker.Logger.log("Player Removed:"+ playerId)
                     break;
             }
         }
@@ -560,7 +629,7 @@ PyPoker = {
             
         let wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
         // let connectionChannel = encodeURIComponent("texas_holdem_texas-holdem");
-        let connectionChannel = encodeURIComponent("texas_holdem");
+        let connectionChannel = encodeURIComponent("texas_holdem"+ roomId);
 
 
         PyPoker.socket = new WebSocket(
@@ -574,16 +643,26 @@ PyPoker = {
         PyPoker.socket.onopen = function() {
             console.log('WebSocket connected');
             PyPoker.Logger.log('Connected :)');
+
+            // Send a message to identify the player
+            PyPoker.socket.send(JSON.stringify({
+                'message_type': 'connect',
+                'player_id': playerId,
+                'player_name': playerName,
+                'player_money': playerMoney,
+                'room_id': roomId}));
         };
 
         PyPoker.socket.onclose = function() {
             console.error('WebSocket disconnected');
             PyPoker.Logger.log('Disconnected :(');
             PyPoker.Room.destroyRoom();
+            PyPoker.socket=null;
         };
 
         PyPoker.socket.onmessage = function(message) {
             var data = JSON.parse(message.data);
+            
 
             console.log(data);
 
@@ -600,8 +679,14 @@ PyPoker = {
                 case 'room-update':
                     PyPoker.Room.onRoomUpdate(data);
                     break;
+                case 'player-added':
+                    PyPoker.Room.onPlayerAdded(data);
+                    break;
                 case 'game-update':
                     PyPoker.Game.onGameUpdate(data);
+                    break;
+                case 'player-removed':
+                    PyPoker.Room.onPlayerRemoved(data);
                     break;
                 case 'error':
                     PyPoker.Logger.log(data.error);
@@ -649,23 +734,50 @@ PyPoker = {
         PyPoker.Player.disableBetMode();
     },
 
- 
+    // onConnect: function(message) {
+    //     PyPoker.Logger.log("Connection established with poker server.");
+    //     if (message.player_id) {
+    //         $('#current-player').attr('data-player-id', message.player_id);
+    //         $('#current-player').attr('data-player-name', message.player_name);
+    //         $('#current-player').attr('data-player-money', message.player_money);
+    //         PyPoker.Logger.log("Player ID: " + message.player_id);
+    //         PyPoker.Logger.log("Player Name: " + message.player_name);
+    //     } else {
+    //         console.error("player_id is missing in the message:", message);
+    //     }
+    // },
     onConnect: function(message) {
-        if (PyPoker.socket && PyPoker.socket.readyState === WebSocket.OPEN) {
-            console.warn("WebSocket is already open.");
-            return;
-        }
-        PyPoker.Logger.log("Connection established with poker5 server.");
-        if (message.player_id) {
+        PyPoker.Logger.log("Connection established with poker server.");
+        if (message.player_id == playerId) {
             $('#current-player').attr('data-player-id', message.player_id);
-        }   else {
-            console.error("player_id is missing in the message:", message);
+            $('#current-player').attr('data-player-name', message.player_name);
+            $('#current-player').attr('data-player-money', message.player_money);
+            PyPoker.Logger.log("Player ID: " + message.player_id);
+            PyPoker.Logger.log("Player Name: " + message.player_name);
         }
-        PyPoker.Logger.log("Connection established with poker5 server.");
-        $('#current-player').attr('data-player-id', message.player_id);
-        $('#current-player').attr('data-player-name', message.player_name);
-        $('#current-player').attr('data-player-money', message.player_money);
     },
+    
+
+    // onConnect: function(message) {
+    //     if (PyPoker.socket && PyPoker.socket.readyState === WebSocket.OPEN) {
+    //         console.warn("WebSocket is already open.");
+    //         return;
+    //     }
+    //     PyPoker.Logger.log("Connection established with poker5 server.");
+    //     if (message.player_id) {
+    //         $('#current-player').attr('data-player-id', message.player_id);
+    //     }   else {
+    //         console.error("player_id is missing in the message:", message);
+    //     }
+    //     PyPoker.Logger.log("Connection established with poker5 server.");
+    //     // $('#current-player').attr('data-player-id', message.player_id);
+    //     // $('#current-player').attr('data-player-name', message.player_name);
+    //     // $('#current-player').attr('data-player-money', message.player_money);
+    //     $('#current-player').attr('data-player-id', playerId);
+    //     $('#current-player').attr('data-player-name', playerName);
+    //     $('#current-player').attr('data-player-money', playerMoney);
+
+    // },
     
 
     onDisconnect: function(message) {

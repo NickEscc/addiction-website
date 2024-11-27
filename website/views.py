@@ -36,24 +36,7 @@ def login_view(request):
     request.session.flush()
     return render(request, "website/login.html")
 
-@require_http_methods(["POST"])
-# def join(request):
-#     if request.method == "POST":
-#         player_name = request.POST.get("name")
-#         room_id = request.POST.get("room-id", "default-room")
-#         request.session["player-id"] = str(uuid.uuid4())
-#         request.session["player-name"] = player_name
-#         request.session["player-money"] = 1000  # Example starting money
-#         request.session["room-id"] = room_id  # Store room_id in session
 
-#         # Pass all necessary variables to the template
-#         return render(request, "website/game.html", {
-#             "player_id": request.session["player-id"],
-#             "player_name": player_name,
-#             "player_money": request.session["player-money"],
-#             "room_id": room_id,
-#         })
-#     return redirect("login")
 @require_http_methods(["POST"])
 def join(request):
     """
@@ -83,34 +66,7 @@ def start_texas_game(request):
     return JsonResponse({"status": "Texas Hold'em game started", "pid": process.pid})
 
 
-# def start_traditional_game(request):
-#     """
-#     Starts a Traditional Poker game service as a subprocess.
-#     """
-#     process = Popen(['python', 'website/Services/traditional_poker_service.py'])
-#     return JsonResponse({"status": "Traditional poker game started", "pid": process.pid})
 
-
-# WEBSOCKET HANDLING FOR POKER GAME
-# views.py
-# def Game(request):
-#     """
-#     Renders the game page with the player context.
-#     """
-#     if "player-id" not in request.session:
-#         return redirect(reverse("login"))
-
-#     player_id = request.session["player-id"]
-#     player_name = request.session.get("player-name", "Guest")
-#     player_money = request.session.get("player-money", 0)
-#     room_id = request.session.get("room-id", "default-room")
-
-#     return render(request, "website/game.html", {
-#         "player_id": player_id,
-#         "player_name": player_name,
-#         "player_money": player_money,
-#         "room_id": room_id,
-#     })
 def game(request):
     """
     Renders the game page with the player context.
@@ -144,17 +100,3 @@ def login(request):
     return render(request, "website/login.html")
 
 
-# def Game(request):
-#     """
-#     Renders the game page with the player context.
-#     """
-#     if "player-id" not in request.session:
-#         return redirect(reverse("login"))
-
-#     player_name = request.session.get("player-name", "Guest")
-#     room_id = request.session.get("room-id", "default-room")
-
-#     return render(request, "website/game.html", {
-#         "player_name": player_name,
-#         "room_id": room_id,
-#     })

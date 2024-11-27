@@ -1,14 +1,6 @@
 // website/static/js/application.js
 
-if (typeof window === "undefined") {
-    const jsdom = require("jsdom");
-    const { JSDOM } = jsdom;
-    const { window } = new JSDOM("<!DOCTYPE html><p>Hello world</p>");
-    const $ = require("jquery")(window);
 
-    // Make `$` globally available
-    global.$ = $;
-}
 PyPoker = {
 
 
@@ -30,18 +22,21 @@ PyPoker = {
                 x = 0;
                 y = 0;
 
+                var staticUrl = window.staticUrl || '/static/';
+
                 if ($(this).hasClass('small')) {
-                    url = "static/images/cards-small.png";
+
+                    url = staticUrl+ "images/cards-small.png";
                     width = 24;
                     height = 40;
                 }
                 else if ($(this).hasClass('medium')) {
-                    url = "static/images/cards-medium.png";
+                    url = staticUrl + "images/cards-medium.png";
                     width = 45;
                     height = 75;
                 }
                 else {
-                    url = "static/images/cards-large.png";
+                    url =staticUrl + "images/cards-large.png";
                     width = 75;
                     height = 125;
                 }
@@ -488,6 +483,14 @@ PyPoker = {
             $('#players').empty();
         },
 
+        onPlayerRemoved: function(message) {
+            var playerId = message.player_id;
+            // Remove the player element from the DOM
+            $('#players .player[data-player-id="' + playerId + '"]').remove();
+        
+            PyPoker.Logger.log("Player removed: " + playerId);
+        },
+
         initRoom: function(message) {
             PyPoker.Room.roomId = message.room_id;
             // Initializing the room
@@ -511,9 +514,37 @@ PyPoker = {
             }
         },
 
+        onPlayerAdded: function(message) {
+            var player = {
+                id: message.player_id,
+                name: message.player_name,
+                money: message.player_money
+            };
+            var $playerElement = PyPoker.Room.createPlayer(player);
+            $('#players').append($playerElement);
+        
+            PyPoker.Logger.log("Player added: " + player.name);
+        },
+
+        initRoom: function(message) {
+            // Clear existing players
+            $('#players').empty();
+        
+            var players = message.players;
+        
+            // Iterate over the players and add them to the room
+            players.forEach(function(player) {
+                var $playerElement = PyPoker.Room.createPlayer(player);
+                $('#players').append($playerElement);
+            })
+        },
+        
+
         onRoomUpdate: function(message) {
-            if (PyPoker.Room.roomId == null) {
+            if (message.event == 'initial') {
                 PyPoker.Room.initRoom(message);
+            }else{
+
             }
 
             switch (message.event) {
@@ -553,9 +584,15 @@ PyPoker = {
 
     init: function() {
         //Testing
+        if (PyPoker.socket && PyPoker.socket.readyState === WebSocket.OPEN) {
+            console.warn("WebSocket is already open.");
+            return;
+        }
             
         let wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
-        let connectionChannel = encodeURIComponent("texas_holdem_texas-holdem");
+        // let connectionChannel = encodeURIComponent("texas_holdem_texas-holdem");
+        let connectionChannel = encodeURIComponent("texas_holdem"+ roomId);
+
 
         PyPoker.socket = new WebSocket(
         wsScheme + window.location.host + "/ws/Services/" + connectionChannel + "/"
@@ -568,16 +605,26 @@ PyPoker = {
         PyPoker.socket.onopen = function() {
             console.log('WebSocket connected');
             PyPoker.Logger.log('Connected :)');
+
+            // Send a message to identify the player
+            PyPoker.socket.send(JSON.stringify({
+                'message_type': 'connect',
+                'player_id': playerId,
+                'player_name': playerName,
+                'player_money': playerMoney,
+                'room_id': roomId}));
         };
 
         PyPoker.socket.onclose = function() {
             console.error('WebSocket disconnected');
             PyPoker.Logger.log('Disconnected :(');
             PyPoker.Room.destroyRoom();
+            PyPoker.socket=null;
         };
 
         PyPoker.socket.onmessage = function(message) {
             var data = JSON.parse(message.data);
+            
 
             console.log(data);
 
@@ -594,8 +641,14 @@ PyPoker = {
                 case 'room-update':
                     PyPoker.Room.onRoomUpdate(data);
                     break;
+                case 'player-added':
+                    PyPoker.Room.onPlayerAdded(data);
+                    break;
                 case 'game-update':
                     PyPoker.Game.onGameUpdate(data);
+                    break;
+                case 'player-removed':
+                    PyPoker.Room.onPlayerRemoved(data);
                     break;
                 case 'error':
                     PyPoker.Logger.log(data.error);
@@ -643,19 +696,50 @@ PyPoker = {
         PyPoker.Player.disableBetMode();
     },
 
- 
+    // onConnect: function(message) {
+    //     PyPoker.Logger.log("Connection established with poker server.");
+    //     if (message.player_id) {
+    //         $('#current-player').attr('data-player-id', message.player_id);
+    //         $('#current-player').attr('data-player-name', message.player_name);
+    //         $('#current-player').attr('data-player-money', message.player_money);
+    //         PyPoker.Logger.log("Player ID: " + message.player_id);
+    //         PyPoker.Logger.log("Player Name: " + message.player_name);
+    //     } else {
+    //         console.error("player_id is missing in the message:", message);
+    //     }
+    // },
     onConnect: function(message) {
-        PyPoker.Logger.log("Connection established with poker5 server.");
-        if (message.player_id) {
+        PyPoker.Logger.log("Connection established with poker server.");
+        if (message.player_id == playerId) {
             $('#current-player').attr('data-player-id', message.player_id);
-        }   else {
-            console.error("player_id is missing in the message:", message);
+            $('#current-player').attr('data-player-name', message.player_name);
+            $('#current-player').attr('data-player-money', message.player_money);
+            PyPoker.Logger.log("Player ID: " + message.player_id);
+            PyPoker.Logger.log("Player Name: " + message.player_name);
         }
-        PyPoker.Logger.log("Connection established with poker5 server.");
-        $('#current-player').attr('data-player-id', message.player_id);
-        $('#current-player').attr('data-player-name', message.player_name);
-        $('#current-player').attr('data-player-money', message.player_money);
     },
+    
+
+    // onConnect: function(message) {
+    //     if (PyPoker.socket && PyPoker.socket.readyState === WebSocket.OPEN) {
+    //         console.warn("WebSocket is already open.");
+    //         return;
+    //     }
+    //     PyPoker.Logger.log("Connection established with poker5 server.");
+    //     if (message.player_id) {
+    //         $('#current-player').attr('data-player-id', message.player_id);
+    //     }   else {
+    //         console.error("player_id is missing in the message:", message);
+    //     }
+    //     PyPoker.Logger.log("Connection established with poker5 server.");
+    //     // $('#current-player').attr('data-player-id', message.player_id);
+    //     // $('#current-player').attr('data-player-name', message.player_name);
+    //     // $('#current-player').attr('data-player-money', message.player_money);
+    //     $('#current-player').attr('data-player-id', playerId);
+    //     $('#current-player').attr('data-player-name', playerName);
+    //     $('#current-player').attr('data-player-money', playerMoney);
+
+    // },
     
 
     onDisconnect: function(message) {
@@ -668,5 +752,7 @@ PyPoker = {
 }
 
 $(document).ready(function() {
-    PyPoker.init();
+    if ($('#game-wrapper').length) {
+        PyPoker.init();
+    }
 });

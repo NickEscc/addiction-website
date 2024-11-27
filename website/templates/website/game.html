@@ -10,6 +10,7 @@
     <main id="main">
         <!-- Injecting player and room variables for JavaScript -->
         <script type="text/javascript">
+            {% comment %} var staticUrl = "{% static 'images/' %}"; {% endcomment %}
             var playerId = "{{ player_id|escapejs }}";
             var playerName = "{{ player_name|escapejs }}";
             var playerMoney = {{ player_money|default:0 }};
