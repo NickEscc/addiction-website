@@ -1,3 +1,4 @@
+<!-- templates/index.html -->
 {% load static %}
 
 <!DOCTYPE html>
@@ -19,8 +20,13 @@
     <h1 style="color: black; text-align: center;">Python Games</h1>
 
     {% block content %}
-    <p style="text-align: center; color: black;">No content to display</p>
+    <div class="container">
+        <div style="text-align: center;">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
+        </div>
+    </div>
     {% endblock %}
+
 
     <!-- JavaScript Files -->
     <script type="text/javascript" src="{% static 'js/jquery-2.0.3.min.js' %}"></script>

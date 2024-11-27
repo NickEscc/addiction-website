@@ -13,27 +13,27 @@ from .player_server import PlayerServer
 
 
 class GameServerRedis(GameServer):
-    # def start(self):
-    # # Subscribe to 'game_server' channel for messages from WebSocket server
-    #     pubsub = self._redis.pubsub()
-    #     pubsub.subscribe('game_server')
+    def start(self):
+    # Subscribe to 'game_server' channel for messages from WebSocket server
+        pubsub = self._redis.pubsub()
+        pubsub.subscribe('game_server')
 
-    #     while True:
-    #         message = pubsub.get_message(ignore_subscribe_messages=True)
-    #         if message:
-    #             # Handle message from player
-    #             player_message = json.loads(message['data'])
-    #             # Process the message
-    #             self.handle_player_message(player_message)
+        while True:
+            message = pubsub.get_message(ignore_subscribe_messages=True)
+            if message:
+                # Handle message from player
+                player_message = json.loads(message['data'])
+                # Process the message
+                self.handle_player_message(player_message)
 
-    #     # Game logic processing
+        # Game logic processing
           
 
-    # def handle_player_message(self, message):
-    #     player_id = message.get('player_id')
-    # # Process the message and send responses back via Redis
-    #     response = {'message_type': 'update', 'data': '...'}
-    #     self._redis.publish(f'player:{player_id}', json.dumps(response))
+    def handle_player_message(self, message):
+        player_id = message.get('player_id')
+    # Process the message and send responses back via Redis
+        response = {'message_type': 'update', 'data': '...'}
+        self._redis.publish(f'player:{player_id}', json.dumps(response))
     def __init__(self, redis: Redis, connection_channel: str, room_factory: GameRoomFactory, logger=None):
         GameServer.__init__(self, room_factory, logger)
         self._redis: Redis = redis

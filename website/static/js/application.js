@@ -552,20 +552,24 @@ PyPoker = {
     },
 
     init: function() {
+        //Testing
+        if (PyPoker.socket && PyPoker.socket.readyState === WebSocket.OPEN) {
+            console.warn("WebSocket is already open.");
+            return;
+        }
+            
         let wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
-        let connectionChannel = encodeURIComponent("texas-holdem");
+        // let connectionChannel = encodeURIComponent("texas_holdem_texas-holdem");
+        let connectionChannel = encodeURIComponent("texas_holdem");
+
 
         PyPoker.socket = new WebSocket(
-        wsScheme + location.host + "/ws/Services/" + connectionChannel + "/"
+        wsScheme + window.location.host + "/ws/Services/" + connectionChannel + "/"
         );
 
 
         console.log("Initializing WebSocket connection...");
-
-        // let wsScheme = window.location.protocol === "https:" ? "wss://" : "ws://";
-        PyPoker.socket = new WebSocket(
-            wsScheme + location.host + "/ws/Services/texas-holdem/"
-                );
+      
 
         PyPoker.socket.onopen = function() {
             console.log('WebSocket connected');
@@ -645,10 +649,24 @@ PyPoker = {
         PyPoker.Player.disableBetMode();
     },
 
+ 
     onConnect: function(message) {
-        PyPoker.Logger.log("Connection established with poker5 server: " + message.server_id);
-        $('#current-player').attr('data-player-id', message.player.id);
+        if (PyPoker.socket && PyPoker.socket.readyState === WebSocket.OPEN) {
+            console.warn("WebSocket is already open.");
+            return;
+        }
+        PyPoker.Logger.log("Connection established with poker5 server.");
+        if (message.player_id) {
+            $('#current-player').attr('data-player-id', message.player_id);
+        }   else {
+            console.error("player_id is missing in the message:", message);
+        }
+        PyPoker.Logger.log("Connection established with poker5 server.");
+        $('#current-player').attr('data-player-id', message.player_id);
+        $('#current-player').attr('data-player-name', message.player_name);
+        $('#current-player').attr('data-player-money', message.player_money);
     },
+    
 
     onDisconnect: function(message) {
 
@@ -660,5 +678,7 @@ PyPoker = {
 }
 
 $(document).ready(function() {
-    PyPoker.init();
-})
+    if ($('#game-wrapper').length) {
+        PyPoker.init();
+    }
+});

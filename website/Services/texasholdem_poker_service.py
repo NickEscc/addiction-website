@@ -26,7 +26,9 @@ def main():
         # Configure the game server
         server = GameServerRedis(
             redis=redis_client,
-            connection_channel="texas-holdem-poker:lobby",
+            # connection_channel="texas_holdem_texas-holdem",  # Updated to match the consumer
+            connection_channel="texas_holdem",  # Updated to match the consumer
+
             room_factory=GameRoomFactory(
                 room_size=10,
                 game_factory=HoldemPokerGameFactory(

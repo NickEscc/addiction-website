@@ -1,21 +1,25 @@
-import json
 import uuid
 import redis
 import logging
-from channels.generic.websocket import AsyncWebsocketConsumer
+import re
+import json
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.conf import settings
 
 from .Services.texasholdem_poker_service import main as poker_service_main
 
 logger = logging.getLogger(__name__)
 
-class PokerGameConsumer(AsyncWebsocketConsumer):
+class PokerGameConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         logger.info("WebSocket connection initiated.")
         self.connection_channel = self.scope["url_route"]["kwargs"]["connection_channel"]
-        sanitized_channel = self.connection_channel.replace(":", "-")
+        sanitized_channel = re.sub(r'[^a-zA-Z0-9\-_\.]', '_', self.connection_channel)
+        logger.debug(f"Received connection_channel: {self.connection_channel}")
 
-        self.group_name = f"texas-holdem:{self.connection_channel}"
+        # self.group_name = f"texas_holdem_{sanitized_channel}"
+        self.group_name = f"{sanitized_channel}"
+
         logger.info(f"Connecting to group: {self.group_name}")
 
         # Connect to Redis
