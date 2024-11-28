@@ -1,21 +1,46 @@
+# website/Services/Logic/game_server_redis.py
+
 import time
 from typing import Generator
 import json
 from redis import Redis
-
+import logging
 
 from .game_room import GameRoomFactory
 from .channel_redis import MessageQueue, ChannelRedis, ChannelError, MessageFormatError, MessageTimeout
 from .game_server import GameServer, ConnectedPlayer
 from .player_server import PlayerServer
-
-
+import threading
 
 
 class GameServerRedis(GameServer):
+    def __init__(
+        self,
+        redis_client: Redis,
+        connection_channel: str,
+        room_factory: GameRoomFactory,
+        logger=None
+    ):
+        super().__init__(room_factory, logger)
+        self.redis_client = redis_client  # Changed from self._redis
+        self.connection_channel = connection_channel  # Changed from self._connection_channel
+        self.active_games = set()  # Initialize as a set to track active games
+
+    def is_game_running(self, room_id):
+        # Implement logic to check if a game is running in the room
+        return room_id in self.active_games
+
+    def start_game(self, game_room):
+        if game_room.id in self.active_games:
+            self.logger.warning(f"Game already running in room {game_room.id}")
+            return
+        self.active_games.add(game_room.id)
+        self.logger.info(f"Starting game in room {game_room.id}")
+        threading.Thread(target=game_room.activate, daemon=True).start()
+
     def start(self):
-    # Subscribe to 'game_server' channel for messages from WebSocket server
-        pubsub = self._redis.pubsub()
+        # Subscribe to 'game_server' channel for messages from WebSocket server
+        pubsub = self.redis_client.pubsub()
         pubsub.subscribe('game_server')
 
         while True:
@@ -25,20 +50,13 @@ class GameServerRedis(GameServer):
                 player_message = json.loads(message['data'])
                 # Process the message
                 self.handle_player_message(player_message)
-
-        # Game logic processing
-          
+            time.sleep(0.01)  # Sleep briefly to prevent tight loop
 
     def handle_player_message(self, message):
         player_id = message.get('player_id')
-    # Process the message and send responses back via Redis
+        # Process the message and send responses back via Redis
         response = {'message_type': 'update', 'data': '...'}
-        self._redis.publish(f'player:{player_id}', json.dumps(response))
-    def __init__(self, redis: Redis, connection_channel: str, room_factory: GameRoomFactory, logger=None):
-        GameServer.__init__(self, room_factory, logger)
-        self._redis: Redis = redis
-        self._connection_queue = MessageQueue(redis, connection_channel)
-    
+        self.redis_client.publish(f'player:{player_id}', json.dumps(response))
 
     def _connect_player(self, message) -> ConnectedPlayer:
         try:
@@ -89,11 +107,11 @@ class GameServerRedis(GameServer):
 
         player = PlayerServer(
             channel=ChannelRedis(
-                self._redis,
-                "poker5:player-{}:session-{}:I".format(player_id, session_id),
-                "poker5:player-{}:session-{}:O".format(player_id, session_id)
+                self.redis_client,
+                f"poker5:player-{player_id}:session-{session_id}:I",
+                f"poker5:player-{player_id}:session-{session_id}:O"
             ),
-            logger=self._logger,
+            logger=self.logger,
             id=player_id,
             name=player_name,
             money=player_money,
@@ -102,7 +120,7 @@ class GameServerRedis(GameServer):
         # Acknowledging the connection
         player.send_message({
             "message_type": "connect",
-            "server_id": self._id,
+            "server_id": self.id,  # Assuming GameServer has an 'id' attribute
             "player": player.dto()
         })
 
@@ -111,6 +129,15 @@ class GameServerRedis(GameServer):
     def new_players(self) -> Generator[ConnectedPlayer, None, None]:
         while True:
             try:
-                yield self._connect_player(self._connection_queue.pop())
+                message = self._connection_queue.pop()
+                yield self._connect_player(message)
             except (ChannelError, MessageTimeout, MessageFormatError) as e:
-                self._logger.error("Unable to connect the player: {}".format(e.args[0]))
+                self.logger.error("Unable to connect the player: {}".format(e.args[0]))
+                continue
+
+    def game_over(self, room_id):
+        if room_id in self.active_games:
+            self.active_games.discard(room_id)
+            self.logger.info(f"Game over in room {room_id}. Room is now available for new games.")
+        else:
+            self.logger.warning(f"Attempted to end game in room {room_id}, but no active game was found.")

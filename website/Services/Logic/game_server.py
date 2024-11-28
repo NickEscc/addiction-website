@@ -17,15 +17,14 @@ class ConnectedPlayer:
 
 class GameServer:
     def __init__(self, room_factory: GameRoomFactory, logger=None):
-        self._id: str = str(uuid4())
-        self._rooms: List[GameRoom] = []
-        self._players: Dict[str, PlayerServer] = {}
-        self._lobby_lock = threading.Lock()
-        self._room_factory: GameRoomFactory = room_factory
-        self._logger = logger if logger else logging
+        self.room_factory = room_factory  # Initialize _room_factory attribute
+        self.logger = logger or logging.getLogger(__name__)  # Initialize _logger
+        self.active_games = set()  # Set to track active game rooms
+        self._rooms: List[GameRoom] = []  # Initialize _rooms as an empty list
+        self._lobby_lock = threading.Lock()  # Initialize _lobby_lock
 
     def __str__(self):
-        return "server {}".format(self._id)
+        return "GameServer"
 
     def new_players(self) -> Generator[ConnectedPlayer, None, None]:
         raise NotImplementedError
@@ -34,22 +33,19 @@ class GameServer:
         try:
             return next(room for room in self._rooms if room.id == room_id)
         except StopIteration:
+            # Create a new private room since it's specified as private=True
             room = self._room_factory.create_room(id=room_id, private=True, logger=self._logger)
             self._rooms.append(room)
             return room
 
     def _join_private_room(self, player: PlayerServer, room_id: str) -> GameRoom:
-        self._lobby_lock.acquire()
-        try:
+        with self._lobby_lock:
             room = self.__get_room(room_id)
             room.join(player)
             return room
-        finally:
-            self._lobby_lock.release()
 
     def _join_any_public_room(self, player: PlayerServer) -> GameRoom:
-        self._lobby_lock.acquire()
-        try:
+        with self._lobby_lock:
             # Adding player to the first non-full public room
             for room in self._rooms:
                 if not room.private:
@@ -60,40 +56,39 @@ class GameServer:
                         pass
 
             # All rooms are full: creating new room
-            room = self._room_factory.create_room(id=str(uuid4()), private=False, logger=self._logger)
+            room_id = str(uuid4())
+            room = self._room_factory.create_room(id=room_id, private=False, logger=self._logger)
             room.join(player)
             self._rooms.append(room)
             return room
-        finally:
-            self._lobby_lock.release()
 
     def _join_room(self, player: ConnectedPlayer) -> GameRoom:
         if player.room_id is None:
-            self._logger.info("Player {}: joining public room".format(player.player))
+            self._logger.info(f"Player {player.player.id}: joining public room")
             return self._join_any_public_room(player.player)
         else:
-            self._logger.info("Player {}: joining private room {}".format(player.player, player.room_id))
+            self._logger.info(f"Player {player.player.id}: joining private room {player.room_id}")
             return self._join_private_room(player.player, player.room_id)
 
     def start(self):
-        self._logger.info("{}: running".format(self))
+        self._logger.info(f"{self} running")
         self.on_start()
         try:
             for player in self.new_players():
                 # Player successfully connected: joining the lobby
-                self._logger.info("{}: {} connected".format(self, player.player))
+                self._logger.info(f"{self}: {player.player} connected")
                 try:
                     room = self._join_room(player)
-                    self._logger.info("Room: {}".format(room.id))
+                    self._logger.info(f"Room: {room.id}")
                     if not room.active:
                         room.active = True
                         gevent.spawn(room.activate)
-                except:
+                except Exception as e:
                     # Close bad connections and ignore the connection
-                    self._logger.exception("{}: bad connection".format(self))
+                    self._logger.exception(f"{self}: bad connection - {str(e)}")
                     pass
         finally:
-            self._logger.info("{}: terminating".format(self))
+            self._logger.info(f"{self} terminating")
             self.on_shutdown()
 
     def on_start(self):
