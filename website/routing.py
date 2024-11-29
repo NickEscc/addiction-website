@@ -1,9 +1,8 @@
-from django.urls import path
-# from website.consumer import  EchoConsumer
-from website.consumer import PokerGameConsumer
+# website/routing.py
+
+from django.urls import re_path
+from .consumer import PokerGameConsumer
 
 websocket_urlpatterns = [
-    path("ws/Services/<str:connection_channel>/", PokerGameConsumer.as_asgi()),
-    # path("ws/Services/<str:connection_channel>/", EchoConsumer.as_asgi()),
-
+    re_path(r'ws/Services/(?P<connection_channel>[^/]+)/$', PokerGameConsumer.as_asgi()),
 ]

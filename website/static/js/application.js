@@ -728,3 +728,6 @@ $(document).ready(function() {
     if ($('#game-wrapper').length) 
         PyPoker.init();
 });
+
+// website/static/js/application.js
+

@@ -7,6 +7,7 @@ from .player import Player
 from .channel import MessageFormatError, Channel
 from .channel_redis import ChannelRedis, MessageQueue
 
+#website/Services/Logic/player_client.py
 
 class PlayerClient:
     def __init__(self, player: Player, connection_message: Any, server_channel: Channel):
@@ -58,8 +59,10 @@ class PlayerClientConnector:
 
         server_channel = ChannelRedis(
             self._redis,
-            "poker5:player-{}:session-{}:O".format(player.id, session_id),
-            "poker5:player-{}:session-{}:I".format(player.id, session_id)
+            # "poker5:player-{}:session-{}:O".format(player.id, session_id),
+            # "poker5:player-{}:session-{}:I".format(player.id, session_id)
+            f"poker5:player-{player.id}:session-{session_id}:O",
+            f"poker5:player-{player.id}:session-{session_id}:I"
         )
 
         # Reading connection response

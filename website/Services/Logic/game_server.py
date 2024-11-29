@@ -2,6 +2,9 @@ import logging
 import threading
 from typing import List, Generator, Dict
 from uuid import uuid4
+from asgiref.sync import async_to_sync
+
+#website/Services/Logic/game_server.py
 
 import gevent
 
@@ -22,7 +25,15 @@ class GameServer:
         self.active_games = set()  # Set to track active game rooms
         self._rooms: List[GameRoom] = []  # Initialize _rooms as an empty list
         self._lobby_lock = threading.Lock()  # Initialize _lobby_lock
-
+    def send_ping(self):
+        message = {
+            "type": "game_message",
+            "message": {
+                "message_type": "ping"
+         }
+        }
+        async_to_sync(self.channel_layer.group_send)(self.group_name, message)
+        self.logger.debug(f"Sent ping to group {self.group_name}")
     def __str__(self):
         return "GameServer"
 
