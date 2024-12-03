@@ -55,43 +55,20 @@
             margin-top: 80px;  /* Space between title and navigation bar */
         }
 
-        /* Left and Right Navigation Links Styling */
-        nav a {
-            color: white;
-            margin: 0 20px;  /* Space out the links */
-            text-decoration: none;
-            font-size: 18px;  /* Font size for navigation links */
-        }
-
-        nav a:hover {
-            color: #FFAA00;  /* Change color on hover */
-        }
-
-        /* Center Navigation Links */
-        .nav-center {
-            display: flex;
-            justify-content: center;
-            flex-grow: 1; /* This ensures it takes up available space between left and right items */
-        }
-
-        /* Center Links Styling */
-        .nav-center a {
-            margin: 0 20px; /* Space out the center links */
-        }
-
-        /* Play Now Button Styling */
-        .play-now-btn {
-            background-color: #FF0000;
-            color: white;
+        /* Button Styling for Navigation Links */
+        .nav-btn {
+            background-color: #FFAA00; /* Orange background */
+            color: white; /* White text */
             padding: 10px 20px;
             border-radius: 5px;
             text-decoration: none;
             font-weight: bold;
-            margin-left: 20px; /* Adds spacing from other links */
+            font-size: 18px;
+            margin: 0 10px; /* Space between buttons */
         }
 
-        .play-now-btn:hover {
-            background-color: #CC0000; /* Darker red on hover */
+        .nav-btn:hover {
+            background-color: #FF7F00; /* Darker orange on hover */
         }
 
         /* Sign Up Button Styling */
@@ -105,7 +82,7 @@
         }
 
         .signup-btn:hover {
-            background-color: #FF7F00;  /* Darker gold on hover */
+            background-color: #FF7F00; /* Darker orange on hover */
         }
 
         /* Centered "Must be 21 to play" text */
@@ -131,9 +108,9 @@
 
         <!-- Centered links (How It Works, How to Play, Play Now) -->
         <div class="nav-center">
-            <a href="how-it-works.html">How It Works</a>
-            <a href="how-to-play.html">How to Play</a>
-            <a href="play-now.html" class="play-now-btn">Play Now</a>
+            <a href="how-it-works.html" class="nav-btn">How It Works</a>
+            <a href="how-to-play.html" class="nav-btn">How to Play</a>
+            <a href="play-now.html" class="nav-btn">Play Now</a>
         </div>
 
         <!-- Right side links (Login and Sign Up) -->
