@@ -7,6 +7,8 @@ import time
 import threading
 import json
 import django
+from asgiref.sync import async_to_sync
+
 from channels.layers import get_channel_layer
 
 # Set the correct Django settings module
@@ -19,7 +21,7 @@ def main():
     logger = logging.getLogger("TexasHoldemServer")
 
     # Get the channel layer
-    channel_layer = get_channel_layer()
+    # channel_layer = get_channel_layer()
 
     # Get Redis URL from environment or use default
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
@@ -43,6 +45,9 @@ def monitor_rooms(redis_client, logger):
     pubsub.subscribe("room_updates")
     logger.debug("Subscribed to 'room_updates' channel.")
 
+    rooms = {}  # Keep track of rooms and their players
+    channel_layer = get_channel_layer()
+
     for message in pubsub.listen():
         if message['type'] != 'message':
             continue
@@ -51,19 +56,38 @@ def monitor_rooms(redis_client, logger):
             data = json.loads(message['data'])
             room_id = data.get('room_id')
             action = data.get('action')
+            player_id = data.get('player_id')
+            player_info = data.get('player_info', {})
 
-            logger.debug(f"Received room update: room_id={room_id}, action={action}")
+            logger.debug(f"Received room update: room_id={room_id}, action={action}, player_id={player_id}")
 
-            if not room_id:
-                logger.warning("Received room_update message without room_id.")
+            if not room_id or not player_id:
+                logger.warning("Received room_update message without room_id or player_id.")
                 continue
 
             if action == "player_joined":
-                # Handle player joined if necessary
-                pass
+                # Add player to room
+                if room_id not in rooms:
+                    rooms[room_id] = []
+                rooms[room_id].append(player_id)
+
+                # Check if there are at least 2 players
+                if len(rooms[room_id]) == 2:
+                    # Start the game
+                    logger.info(f"Starting game in room {room_id}")
+                    # Implement logic to start the game
+                    # For example, create a GameRoom instance and call start_game()
+                    async_to_sync(channel_layer.group_send)(
+                        room_id,
+                        {
+                            "type": "start_game",
+                        }
+                    )
             elif action == "player_left":
-                # Handle player left if necessary
-                pass
+                # Remove player from room
+                if room_id in rooms and player_id in rooms[room_id]:
+                    rooms[room_id].remove(player_id)
+                    logger.info(f"Player {player_id} left room {room_id}")
 
         except json.JSONDecodeError:
             logger.error("Failed to decode JSON from room_updates message.")

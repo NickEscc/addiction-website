@@ -2,7 +2,7 @@ import collections
 from typing import List, Dict, Optional
 
 from .card import Card
-
+# website/services/logic/score_destector.py
 
 class Cards:
     def __init__(self, cards: List[Card], lowest_rank=2):

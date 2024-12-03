@@ -28,7 +28,6 @@ PyPoker = {
                 let x = 0;
                 let y = 0;
 
-                var staticUrl = window.staticUrl || '/static/';
 
                 let url, width, height;
 
@@ -254,7 +253,11 @@ PyPoker = {
                     PyPoker.Game.newGame(message);
                     break;
                 case 'cards-assignment':
-                    PyPoker.Game.updateCurrentPlayerCards(message.cards, message.score);
+                    if (message.target === PyPoker.Game.getCurrentPlayerId()) {
+                        PyPoker.Game.updateCurrentPlayerCards(message.cards, message.score);
+                    } else {
+                        PyPoker.Game.updatePlayersCards(message.players);
+                    }
                     break;
                 case 'game-over':
                     PyPoker.Game.gameOver();

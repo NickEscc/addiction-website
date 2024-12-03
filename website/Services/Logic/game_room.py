@@ -35,9 +35,10 @@ class GameRoom(AsyncConsumer):
         self.player_channels = {}  # Mapping of player IDs to channel names
         self.players = {}  # Store player info
         self.channel_layer = get_channel_layer()
-        self.group_name = f"texas_holdem_{self.id}"
+        self.group_name = f"game_room_{self.id}"
         self.on_game_over = None
         self._event_messages = []
+        
 
     async def add_player(self, event):
         player_id = event['player_id']
@@ -58,6 +59,9 @@ class GameRoom(AsyncConsumer):
 
         # Notify others about new player
         await self.broadcast_room_update()
+        if len(self.players) >= 2 and not self.active:
+            self._logger.info(f"Enough players in room {self.id}. Starting the game.")
+            asyncio.create_task(self.activate())
 
     async def remove_player(self, event):
         player_id = event['player_id']

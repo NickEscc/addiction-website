@@ -1,4 +1,4 @@
-# game_room_consumer.py
+# website/services/logic game_room_consumer.py
 
 import logging
 from channels.generic.websocket import AsyncConsumer
