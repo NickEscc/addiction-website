@@ -76,7 +76,22 @@
 
         /* Center Links Styling */
         .nav-center a {
-            margin: 0 30px; /* Space out the center links */
+            margin: 0 20px; /* Space out the center links */
+        }
+
+        /* Play Now Button Styling */
+        .play-now-btn {
+            background-color: #FF0000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 20px; /* Adds spacing from other links */
+        }
+
+        .play-now-btn:hover {
+            background-color: #CC0000; /* Darker red on hover */
         }
 
         /* Sign Up Button Styling */
@@ -114,10 +129,11 @@
         <!-- Left side links (empty as we don't want any on the left) -->
         <div></div>
 
-        <!-- Centered links (How It Works, How to Play) -->
+        <!-- Centered links (How It Works, How to Play, Play Now) -->
         <div class="nav-center">
             <a href="how-it-works.html">How It Works</a>
             <a href="how-to-play.html">How to Play</a>
+            <a href="play-now.html" class="play-now-btn">Play Now</a>
         </div>
 
         <!-- Right side links (Login and Sign Up) -->
