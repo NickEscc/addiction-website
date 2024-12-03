@@ -2,8 +2,6 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-#daphne -p 8000 addiction.asgi:application
-#http://127.0.0.1:8000
 
 
 def main():

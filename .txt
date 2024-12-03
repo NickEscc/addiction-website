@@ -1,1 +1,0 @@
-the directories are in the top of the files for most of them. I need to when the user log in into login.html, it send them to game.html, via index.thml join as you will see. Once login, it initiates the game which the server is  texasholdem_poker_service.py.  the connection are being done thought application.js and not sure if editing view/ur.l.py is necessary.
