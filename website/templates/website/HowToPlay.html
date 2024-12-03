@@ -209,20 +209,40 @@
     </footer>
 
     <script>
-        // JavaScript to control the Hand Rankings navigation
-        let currentIndex = 0;
-        const rankings = document.querySelectorAll('.hand-ranking');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
+// JavaScript to control the Hand Rankings navigation
+let currentIndex = 0;
+const rankings = document.querySelectorAll('.hand-ranking');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
 
-        // Function to show the current ranking
-        function showRanking(index) {
-            // Hide all rankings
-            rankings.forEach(ranking => ranking.style.display = 'none');
-            
-            // Show the current ranking
-            rankings[index].style.display = 'block';
-            
-            // Update button states
-            prevBtn.disabled
-        }
+// Function to show the current ranking
+function showRanking(index) {
+    // Hide all rankings
+    rankings.forEach(ranking => ranking.style.display = 'none');
+    
+    // Show the current ranking
+    rankings[index].style.display = 'block';
+    
+    // Update button states
+    prevBtn.disabled = index === 0; // Disable prev if it's the first ranking
+    nextBtn.disabled = index === rankings.length - 1; // Disable next if it's the last ranking
+}
+
+// Event listeners for navigation buttons
+prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) {
+        currentIndex--;
+        showRanking(currentIndex);
+    }
+});
+
+nextBtn.addEventListener('click', () => {
+    if (currentIndex < rankings.length - 1) {
+        currentIndex++;
+        showRanking(currentIndex);
+    }
+});
+
+// Initial call to show the first ranking
+showRanking(currentIndex);
+        
