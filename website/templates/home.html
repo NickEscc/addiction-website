@@ -9,7 +9,7 @@
     <!-- Static stylesheet link -->
     {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}"> {% endcomment %}
     {% comment %} YOu can delete this once you have fix the orginal style.css{% endcomment %}
-    <link rel="stylesheet" type="random/css" href="{% static 'website/css/random.css' %}"> 
+    <link rel="stylesheet" href="{% static 'website/static/css/style.css' %}">
 
     <style>
         /* Body Styling */
@@ -96,16 +96,16 @@
         <div></div>
 
         <!-- Centered links (How It Works, How to Play, Play Now) -->
-        <div class="nav-center">
+        {% comment %} <div class="nav-center">
             <a href="how-it-works.html" class="nav-btn">How It Works</a>
             <a href="HowToPlay.html" class="nav-btn">How to Play</a>
             <a href="play-now.html" class="nav-btn">Play Now</a>
-        </div>
+        </div> {% endcomment %}
 
         <!-- Right side links (Login and Sign Up) -->
         <div>
-            <a href="login.html" class="nav-btn">Login</a>
-            <a href="signup.html" class="nav-btn">Sign Up</a>
+            <a href="{% url 'login' %}" class="nav-btn">Login</a>
+            <a href="{% url 'join' %}" class="nav-btn">Sign Up</a>            {% comment %} <a href="signup.html" class="nav-btn">Sign Up</a> {% endcomment %}
         </div>
     </nav>
 
