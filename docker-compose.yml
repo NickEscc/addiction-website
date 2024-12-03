@@ -1,0 +1,22 @@
+# version: '3.8'
+
+services:
+  traditional:
+    build: .
+    command: python3 website/Services/traditional_poker_service.py
+    ports:
+      - "${Traditional_Port}:8005"  # Map host port (from .env) to container port 8005
+    environment:
+      Traditional_Port: 8005
+    env_file:
+      - .env
+  
+  texas:
+    build: .
+    command: python3 website/Services/texasholdem_poker_service.py
+    ports:
+      - "${Texas_Port}:8005"  # Map host port (from .env) to container port 8005
+    environment:
+      Texas_Port: 8005
+    env_file:
+      - .env

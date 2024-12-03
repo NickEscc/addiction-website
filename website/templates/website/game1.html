@@ -1,0 +1,81 @@
+
+<!-- game.html -->
+{% extends 'index.html' %}
+
+{% block title %}Poker Game - Python Games{% endblock %}
+
+{% block content %}
+<div class="container">
+    <main id="main">
+        <!-- Injecting player and room variables for JavaScript -->
+        <script type="text/javascript">
+            {% comment %} var staticUrl = "{% static 'images/' %}"; {% endcomment %}
+            var playerId = "{{ player_id|escapejs }}";
+            var playerName = "{{ player_name|escapejs }}";
+            var playerMoney = {{ player_money|default:0 }};
+            var roomId = "{{ room_id|escapejs }}";
+        </script>
+
+        <h1 style="text-align: center;">Poker Game - Room: {{ room_id }}</h1>
+
+        <div id="game-wrapper">
+            <div class="row">
+                <!-- Players and Table Section -->
+                <div id="table-wrapper" class="col-sm-8">
+                    <div id="players"></div>
+                    <div id="table">
+                        <div class="game-info">
+                            <div id="pots"></div>
+                            <div id="shared-cards"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Player Section -->
+                <div id="current-player-wrapper" class="col-sm-4">
+                    <h4>Welcome, {{ player_name }}!</h4>
+
+                    <!-- Game Status -->
+                    <div id="game-status">
+                        <p data-key="4"></p>
+                        <p data-key="3"></p>
+                        <p data-key="2"></p>
+                        <p data-key="1"></p>
+                        <p data-key="0"></p>
+                    </div>
+
+                    <p>Enjoy your poker game :)</p>
+
+                    <!-- Current Player Details -->
+                    <div id="current-player" class="player">
+                        <div class="cards"></div>
+                        <div id="player-controls">
+                            <!-- Betting Controls -->
+                            <div id="bet-controls" class="controls">
+                                <div id="fold-cmd-wrapper">
+                                    <button id="fold-cmd" class="btn btn-danger">Fold</button>
+                                </div>
+                                <div id="bet-cmd-wrapper">
+                                    <button id="bet-cmd" class="btn btn-primary">Bet</button>
+                                </div>
+                                <div id="no-bet-cmd-wrapper">
+                                    <button id="no-bet-cmd" class="btn btn-warning">No Bet</button>
+                                </div>
+                            </div>
+                            <!-- Card Change Controls -->
+                            <div id="cards-change-controls" class="controls">
+                                <button id="cards-change-cmd" class="btn btn-primary">Change Cards</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Logout Link -->
+                    <div style="margin-top: 20px;">
+                        <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+{% endblock %}

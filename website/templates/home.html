@@ -1,18 +1,21 @@
 <!DOCTYPE html>
+{% comment %} home.html {% endcomment %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poker Addiction - Home</title>
-
+    {% load static %}
     <!-- Static stylesheet link -->
-    <link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}">
+    {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'website/css/style.css' %}"> {% endcomment %}
+    {% comment %} YOu can delete this once you have fix the orginal style.css{% endcomment %}
+    <link rel="stylesheet" type="random/css" href="{% static 'website/css/random.css' %}"> 
 
     <style>
         /* Body Styling */
         body {
-            background-color: black;
-            color: white;
+            background-color: white;
+            color: black;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
