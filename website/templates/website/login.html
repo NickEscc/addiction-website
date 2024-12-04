@@ -1,4 +1,3 @@
-<!-- website/templates/website/login.html -->
 {% extends 'index.html' %}
 
 {% block title %}Login - Python Games{% endblock %}
@@ -8,16 +7,19 @@
     <main id="main">
         <h1 style="text-align: center; color: black;">Welcome to Addiction!</h1>
 
-        <!-- Login Form -->
-        <form action="{% url 'join' %}" method="post">
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <form id="join-form" action="{% url 'join' %}" method="post">
             {% csrf_token %}
             <div id="login-bar">
                 <div class="form-group">
                     <input type="text" class="form-control input-lg" name="name" placeholder="Your name" required>
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control input-lg" name="room-id" placeholder="Room ID (optional)">
-                    <small class="form-text text-muted">Leave this blank to join any room available</small>
+                    <input type="text" class="form-control input-lg" name="room_id" placeholder="Room ID (optional)">
+                    <small class="form-text text-muted">Leave this blank to join any available room</small>
                 </div>
                 <div class="form-group">
                     <button class="btn btn-primary btn-lg login-link" type="submit">Start Playing</button>

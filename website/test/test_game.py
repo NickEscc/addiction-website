@@ -1,9 +1,9 @@
 import unittest
 
 from ..Services.Logic.card import Card
-from ..Services.Logic.player import Player
-from ..Services.Logic.poker_game import *
-from ..Services.Logic.score_detector import HoldemPokerScoreDetector
+from ..Services.Logic.Extra.player import Player
+from ..Services.Logic.Extra.poker_game import *
+from ..Services.Logic.Extra.score_detector import HoldemPokerScoreDetector
 #python -m unittest website.test.test_game
 
 class GamePlayersTest(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 
 from ..Services.Logic.card import Card
-from ..Services.Logic.score_detector import TraditionalPokerScoreDetector, TraditionalPokerScore, HoldemPokerScore, \
+from ..Services.Logic.Extra.score_detector import TraditionalPokerScoreDetector, TraditionalPokerScore, HoldemPokerScore, \
     HoldemPokerScoreDetector
 
 #python -m unittest website.test.test_score

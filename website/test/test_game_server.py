@@ -3,9 +3,9 @@ import unittest
 from typing import Generator
 from unittest import mock
 
-from ..Services.Logic.channel import Channel
-from ..Services.Logic.player_server import PlayerServer
-from ..Services.Logic.game_server import GameServer, ConnectedPlayer
+from ..Services.Logic.Extra.channel import Channel
+from ..Services.Logic.Extra.player_server import PlayerServer
+from ..Services.Logic.Extra.game_server import GameServer, ConnectedPlayer
 #python -m unittest website.test.test_game_server
 
 

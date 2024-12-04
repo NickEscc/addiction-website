@@ -1,98 +1,78 @@
 # website/Services/texasholdem_poker_service.py
 
 import logging
-import redis
+import asyncio
 import os
-import time
-import threading
-import json
-import django
-from asgiref.sync import async_to_sync
+from daphne.server import Server
+from .Logic.PokerGame import HoldemPokerGameFactory
+from .Logic.Game_RoomServer import GameRoomFactory, GameServer
+from .Logic.Game_server_instance import set_game_server_instance
+from typing import Optional  # Add this import
 
-from channels.layers import get_channel_layer
+# Configure the logger
+logger = logging.getLogger("TexasHoldemServer")
+logger.setLevel(logging.INFO)  # Set to INFO or DEBUG as needed
 
-# Set the correct Django settings module
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'addiction.settings')  # Ensure this matches your project name
-django.setup()
+# Add a console handler with a formatter
+handler = logging.StreamHandler()
+formatter = logging.Formatter('[%(asctime)s] %(levelname)s:%(name)s:%(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
-def main():
-    # Configure logging
-    logging.basicConfig(level=logging.DEBUG if 'DEBUG' in os.environ else logging.INFO)
-    logger = logging.getLogger("TexasHoldemServer")
-
-    # Get the channel layer
-    # channel_layer = get_channel_layer()
-
-    # Get Redis URL from environment or use default
-    redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
-
+def initialize_game_server() -> Optional[GameServer]:
+    """
+    Initializes the GameServer and sets the global game_server_instance.
+    """
     try:
-        # Initialize Redis client
-        redis_client = redis.from_url(redis_url)
-        logger.info("Connected to Redis at %s", redis_url)
+        # Create the game factory and room factory
+        game_factory = HoldemPokerGameFactory(big_blind=50, small_blind=25, logger=logger)
+        game_room_factory = GameRoomFactory(game_factory=game_factory, room_size=10, logger=logger)
+        game_server = GameServer(room_factory=game_room_factory, logger=logger)
 
-        # Start monitoring rooms (if necessary)
-        threading.Thread(target=monitor_rooms, args=(redis_client, logger), daemon=True).start()
-
-        # Keep the main thread alive
-        while True:
-            time.sleep(1)
+        set_game_server_instance(game_server)
+        logger.info("Game server initialized successfully.")
+        return game_server
     except Exception as e:
-        logger.error("Error occurred: %s", str(e))
+        logger.exception(f"Failed to initialize game server: {e}")
+        return None
 
-def monitor_rooms(redis_client, logger):
-    pubsub = redis_client.pubsub()
-    pubsub.subscribe("room_updates")
-    logger.debug("Subscribed to 'room_updates' channel.")
+async def main():
+    # Initialize the game server
+    game_server = initialize_game_server()
+    if game_server:
+        # Start the game server in the background
+        asyncio.create_task(game_server.start())
+        logger.info("Game server running")
+    else:
+        logger.error("Game server not initialized. Exiting.")
+        exit(1)
 
-    rooms = {}  # Keep track of rooms and their players
-    channel_layer = get_channel_layer()
+    # Ensure DJANGO_SETTINGS_MODULE is set
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'addiction.settings')
 
-    for message in pubsub.listen():
-        if message['type'] != 'message':
-            continue
+    # Import the ASGI application from addiction.asgi
+    try:
+        from addiction.asgi import application
+    except ImportError as e:
+        logger.exception(f"Failed to import ASGI application: {e}")
+        exit(1)
 
-        try:
-            data = json.loads(message['data'])
-            room_id = data.get('room_id')
-            action = data.get('action')
-            player_id = data.get('player_id')
-            player_info = data.get('player_info', {})
+    # Configure Daphne server
+    server = Server(
+        application=application,
+        endpoints=["tcp:port=8000:interface=127.0.0.1"],  # Adjust port and interface as needed
+        signal_handlers=False
+    )
 
-            logger.debug(f"Received room update: room_id={room_id}, action={action}, player_id={player_id}")
+    logger.info("Starting Daphne server on 127.0.0.1:8000")
 
-            if not room_id or not player_id:
-                logger.warning("Received room_update message without room_id or player_id.")
-                continue
-
-            if action == "player_joined":
-                # Add player to room
-                if room_id not in rooms:
-                    rooms[room_id] = []
-                rooms[room_id].append(player_id)
-
-                # Check if there are at least 2 players
-                if len(rooms[room_id]) == 2:
-                    # Start the game
-                    logger.info(f"Starting game in room {room_id}")
-                    # Implement logic to start the game
-                    # For example, create a GameRoom instance and call start_game()
-                    async_to_sync(channel_layer.group_send)(
-                        room_id,
-                        {
-                            "type": "start_game",
-                        }
-                    )
-            elif action == "player_left":
-                # Remove player from room
-                if room_id in rooms and player_id in rooms[room_id]:
-                    rooms[room_id].remove(player_id)
-                    logger.info(f"Player {player_id} left room {room_id}")
-
-        except json.JSONDecodeError:
-            logger.error("Failed to decode JSON from room_updates message.")
-        except Exception as e:
-            logger.error(f"Error processing room_updates message: {str(e)}")
+    # Start Daphne server in a separate thread to avoid blocking the event loop
+    await asyncio.to_thread(server.run)
 
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Server stopped by user.")
+    except Exception as e:
+        logger.exception(f"Unexpected error: {e}")

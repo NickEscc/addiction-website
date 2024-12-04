@@ -1,11 +1,11 @@
 # addiction/routing.py
 
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
+from channels.sessions import SessionMiddlewareStack
 import website.routing
 
 application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(
+    'websocket': SessionMiddlewareStack(
         URLRouter(
             website.routing.websocket_urlpatterns
         )
