@@ -37,9 +37,10 @@ class MessageFormatError(Exception):
 class PlayerServer(Player):
     def __init__(self, id: str, name: str, money: float, channel=None, logger=None):
         super().__init__(id=id, name=name, money=money)
-        self._channel = channel  # channel should be an object with send_json, receive_json methods (e.g. Channels consumer)
+        self._channel = channel
         self._connected = True
         self._logger = logger or logging.getLogger(__name__)
+        self.last_active = asyncio.get_event_loop().time()  # Initialize last active time
 
     @property
     def connected(self) -> bool:
@@ -62,6 +63,8 @@ class PlayerServer(Player):
             else:
                 message = await self._channel.receive_json()
             self._logger.debug(f"Message received from player {self.id}: {message}")
+            # Update last_active time whenever a message is received
+            self.last_active = asyncio.get_event_loop().time()
             return message
         except asyncio.TimeoutError:
             self._logger.error(f"Receiving message timed out for player {self.id}")
@@ -69,7 +72,6 @@ class PlayerServer(Player):
 
     async def disconnect(self):
         if self._connected:
-            # Optionally send a disconnect message
             if self._channel is not None:
                 await self.send_message({"message_type": "disconnect"})
             self._connected = False

@@ -3,11 +3,13 @@
 import logging
 import asyncio
 import os
+import sys
+import signal
 from daphne.server import Server
 from .Logic.PokerGame import HoldemPokerGameFactory
 from .Logic.Game_RoomServer import GameRoomFactory, GameServer
 from .Logic.Game_server_instance import set_game_server_instance
-from typing import Optional  # Add this import
+from typing import Optional
 
 # Configure the logger
 logger = logging.getLogger("TexasHoldemServer")
@@ -36,43 +38,63 @@ def initialize_game_server() -> Optional[GameServer]:
         logger.exception(f"Failed to initialize game server: {e}")
         return None
 
+async def start_daphne_server(application, host: str = "127.0.0.1", port: int = 8000):
+    """
+    Starts the Daphne ASGI server.
+    """
+    server = Server(
+        application=application,
+        endpoints=[f"tcp:port={port}:interface={host}"],
+        signal_handlers=False  # We'll handle signals manually
+    )
+
+    logger.info(f"Starting Daphne server on {host}:{port}")
+    await asyncio.to_thread(server.run)
+
 async def main():
+    # Ensure DJANGO_SETTINGS_MODULE is set before anything else
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'addiction.settings')  # Replace 'addiction' if your project has a different name
+
+    # Initialize Django
+    import django
+    django.setup()
+    logger.info("Django setup completed.")
+
+    # Import the ASGI application after Django setup
+    try:
+        from addiction.asgi import application  # Replace 'addiction' with your project name if different
+    except ImportError as e:
+        logger.exception(f"Failed to import ASGI application: {e}")
+        sys.exit(1)
+
     # Initialize the game server
     game_server = initialize_game_server()
     if game_server:
         # Start the game server in the background
         asyncio.create_task(game_server.start())
-        logger.info("Game server running")
+        logger.info("Game server started as a background task.")
     else:
         logger.error("Game server not initialized. Exiting.")
-        exit(1)
+        sys.exit(1)
 
-    # Ensure DJANGO_SETTINGS_MODULE is set
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'addiction.settings')
+    # Start Daphne server
+    await start_daphne_server(application, host="127.0.0.1", port=8000)
 
-    # Import the ASGI application from addiction.asgi
-    try:
-        from addiction.asgi import application
-    except ImportError as e:
-        logger.exception(f"Failed to import ASGI application: {e}")
-        exit(1)
-
-    # Configure Daphne server
-    server = Server(
-        application=application,
-        endpoints=["tcp:port=8000:interface=127.0.0.1"],  # Adjust port and interface as needed
-        signal_handlers=False
-    )
-
-    logger.info("Starting Daphne server on 127.0.0.1:8000")
-
-    # Start Daphne server in a separate thread to avoid blocking the event loop
-    await asyncio.to_thread(server.run)
+def shutdown(signal_num, frame):
+    """
+    Handles shutdown signals to gracefully terminate the server.
+    """
+    logger.info(f"Received exit signal {signal_num}. Shutting down...")
+    sys.exit(0)
 
 if __name__ == "__main__":
+    # Register signal handlers for graceful shutdown
+    signal.signal(signal.SIGINT, shutdown)
+    signal.signal(signal.SIGTERM, shutdown)
+
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Server stopped by user.")
+        logger.info("Server stopped by user via KeyboardInterrupt.")
     except Exception as e:
         logger.exception(f"Unexpected error: {e}")

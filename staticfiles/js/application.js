@@ -30,15 +30,15 @@ var PyPoker = {
                 let url, width, height;
 
                 if ($(this).hasClass('small')) {
-                    url = staticUrl + "images/cards-small.png";
+                    url = staticUrl + "cards-small.png";
                     width = 24;
                     height = 40;
                 } else if ($(this).hasClass('medium')) {
-                    url = staticUrl + "images/cards-medium.png";
+                    url = staticUrl + "cards-medium.png";
                     width = 45;
                     height = 75;
                 } else {
-                    url = staticUrl + "images/cards-large.png";
+                    url = staticUrl + "cards-large.png";
                     width = 75;
                     height = 125;
                 }
@@ -95,22 +95,30 @@ var PyPoker = {
 
             $('#game-wrapper').addClass(message.game_type);
 
-            for (let key in message.players) {
-                let playerId = message.players[key].id;
-                let $player = $('#players .player[data-player-id=' + playerId + ']');
+            message.players.forEach(function(player) {
+                let playerId = player.id;
+                let $player = $('#players .player[data-player-id="' + playerId + '"]');
                 let $cards = $('.cards', $player);
+                $cards.empty(); // Clear any existing cards
+        
                 for (let i = 0; i < PyPoker.Game.numCards; i++) {
                     $cards.append('<div class="card small" data-key="' + i + '"></div>');
                 }
-
-                if (playerId == message.dealer_id) {
+        
+                if (playerId === message.dealer_id) {
                     $player.addClass('dealer');
+                } else {
+                    $player.removeClass('dealer');
                 }
-                if (playerId == PyPoker.Game.getCurrentPlayerId()) {
+        
+                if (playerId === PyPoker.Game.getCurrentPlayerId()) {
                     $player.addClass('current');
+                } else {
+                    $player.removeClass('current');
                 }
-            }
+            });
             $('#current-player').show();
+            PyPoker.Logger.log("New game initialized.");
         },
 
         gameOver: function() {
@@ -120,6 +128,7 @@ var PyPoker = {
             $('#shared-cards').empty();
             $('#players .player .bet-wrapper').empty();
             $('#current-player').hide();
+            $('#start-game-wrapper').hide(); // Hide Start Game button when game is over
         },
 
         updatePlayer: function(player) {
@@ -169,23 +178,41 @@ var PyPoker = {
 
         updatePlayersCards: function(players) {
             for (let playerId in players) {
-                let $cards = $('.player[data-player-id=' + playerId + '] .cards');
-                PyPoker.Game.setPlayerCards(players[playerId].cards, $cards);
+                let player = players[playerId];
+                let $cardsContainer = $('#players .player[data-player-id="' + playerId + '"] .cards');
+        
+                // Set each card's rank and suit
+                player.cards.forEach(function(card, index) {
+                    let $card = $cardsContainer.find('.card[data-key=' + index + '"]');
+                    PyPoker.Game.setCard($card, card.rank, card.suit);
+                });
+        
+                // Update the score category
+                $cardsContainer.find('.category').text(PyPoker.Game.scoreCategories[player.score.category]);
             }
         },
 
         updateCurrentPlayerCards: function(cards, score) {
-            let $cards = $('.player[data-player-id=' + PyPoker.Game.getCurrentPlayerId() + '] .cards');
-            PyPoker.Game.setPlayerCards(cards, $cards);
-            $('#current-player .cards .category').text(PyPoker.Game.scoreCategories[score.category]);
+            let currentPlayerId = PyPoker.Game.getCurrentPlayerId();
+            let $cardsContainer = $('#players .player[data-player-id="' + currentPlayerId + '"] .cards');
+            cards.forEach(function(card, index) {
+                let $card = $cardsContainer.find('.card[data-key="' + index + '"]');
+                PyPoker.Game.setCard($card, card.rank, card.suit);
+            });
+        
+            // Update the score category
+            $('#players .player[data-player-id="' + currentPlayerId + '"] .cards .category').text(PyPoker.Game.scoreCategories[score.category]);
         },
 
         addSharedCards: function(cards) {
-            for (let cardKey in cards) {
+            let $sharedCardsContainer = $('#shared-cards');
+            $sharedCardsContainer.empty(); // Clear existing shared cards
+
+            cards.forEach(function(card) {
                 let $card = $('<div class="card medium"></div>');
-                PyPoker.Game.setCard($card, cards[cardKey][0], cards[cardKey][1]);
-                $('#shared-cards').append($card);
-            }
+                PyPoker.Game.setCard($card, card.rank, card.suit);
+                $sharedCardsContainer.append($card);
+            });
         },
 
         updatePots: function(pots) {
@@ -206,6 +233,7 @@ var PyPoker = {
             $('#shared-cards').empty();
             $('#players .player .bet-wrapper').empty();
             $('#current-player').hide();
+            $('#start-game-wrapper').hide(); // Hide Start Game button after winners are set
         },
 
         changeCards: function(player, numCards) {
@@ -305,12 +333,12 @@ var PyPoker = {
 
         sliderHandler: function(value) {
             if (value == 0) {
-                $('#bet-cmd').attr("value", "Check");
-            }
-            else {
-                $('#bet-cmd').attr("value", "$" + parseInt(value));
+                $('#bet-cmd').text("Check"); // Use .text() instead of .attr("value", ...)
+            } else {
+                $('#bet-cmd').text("$" + parseInt(value)); // Also use .text() for bet amount
             }
             $('#bet-input').val(value);
+            return value.toString(); // Return value for the slider tooltip
         },
 
         enableBetMode: function(message) {
@@ -458,6 +486,7 @@ var PyPoker = {
             PyPoker.Game.gameOver();
             PyPoker.Room.roomId = null;
             $('#players').empty();
+            $('#start-game-wrapper').hide(); // Hide Start Game button when room is destroyed
         },
 
         onPlayerRemoved: function(message) {
@@ -501,6 +530,18 @@ var PyPoker = {
             }
 
             PyPoker.Room.initRoom(message.players);
+
+            // Show or hide start game button based on can_start
+            // Also highlight which players are ready
+            if (message.can_start) {
+                $('#start-game-wrapper').show();
+            } else {
+                $('#start-game-wrapper').hide();
+            }
+
+            // Optionally, you can show which players are ready
+            // For simplicity, we just log them
+            console.log("Ready players:", message.ready_players);
         }
     },
 
@@ -593,6 +634,17 @@ var PyPoker = {
             PyPoker.Player.disableBetMode();
         };
 
+        // Handle "Start Game" button click
+        $('#start-game-cmd').click(function() {
+            PyPoker.socket.send(JSON.stringify({
+                'message_type': 'start-game'
+            }));
+            PyPoker.Logger.log("You signaled to start the game.");
+            // Optionally, disable the button after clicking
+            $(this).prop('disabled', true).text('Waiting for others...');
+        });
+
+        // Existing button handlers
         $('#cards-change-cmd').click(function() {
             let discards = [];
             $('#current-player .card.selected').each(function() {

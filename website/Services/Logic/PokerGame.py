@@ -1012,6 +1012,8 @@ class HoldemPokerGame(PokerGame):
         return bets
 
     async def play_hand(self, dealer_id):
+        self._logger.info(f"Starting hand in game {self._id} with dealer {dealer_id}")
+
         self._game_players.reset()
         deck = self._deck_factory.create_deck()
         scores = self._create_scores()
@@ -1024,40 +1026,65 @@ class HoldemPokerGame(PokerGame):
             big_blind=self._big_blind,
             small_blind=self._small_blind,
         )
+        self._logger.info("New game event sent.")
 
         try:
             # Collect blinds
             blind_bets = await self._collect_blinds(dealer_id)
+            self._logger.info(f"Blinds collected: {blind_bets}")
+
             bets = blind_bets
 
             # Pre-flop
             await self._assign_cards(2, dealer_id, deck, scores)
+            self._logger.info("Pre-flop cards assigned.")
+
             await self._bet_handler.bet_round(dealer_id, bets, pots)
+            self._logger.info("Pre-flop betting round completed.")
+
 
             # Flop
             await self._add_shared_cards(deck.pop_cards(3), scores)
+            self._logger.info("Flop cards added.")
+
             await self._bet_handler.bet_round(dealer_id, {}, pots)
+            self._logger.info("Flop betting round completed.")
 
             # Turn
             await self._add_shared_cards(deck.pop_cards(1), scores)
+            self._logger.info("Turn card added.")
             await self._bet_handler.bet_round(dealer_id, {}, pots)
+            self._logger.info("Turn betting round completed.")
 
             # River
             await self._add_shared_cards(deck.pop_cards(1), scores)
+            self._logger.info("River card added.")
             await self._bet_handler.bet_round(dealer_id, {}, pots)
+            self._logger.info("River betting round completed.")
+
 
             # Showdown
             if self._game_players.count_active() > 1:
                 await self._showdown(scores)
+                self._logger.info("Showdown completed.")
+
             await self._detect_winners(pots, scores)
+            self._logger.info("Winners detected.")
+
         except EndGameException:
+            self._logger.info("Game ended due to insufficient players.")
+
             await self._detect_winners(pots, scores)
+        except Exception as e:
+            self._logger.exception(f"Error during play_hand: {e}")
         finally:
             await self._event_dispatcher.game_over_event()
+            self._logger.info(f"Game {self._id} hand completed.")
+
 
 
 class HoldemPokerGameFactory(GameFactory):
-    def __init__(self, big_blind: float, small_blind: float, logger, game_subscribers: Optional[List[GameSubscriber]] = None):
+    def __init__(self, big_blind: float, small_blind: float, logger, game_subscribers: Optional[List['GameSubscriber']] = None):
         self._big_blind = big_blind
         self._small_blind = small_blind
         self._logger = logger
@@ -1071,6 +1098,8 @@ class HoldemPokerGameFactory(GameFactory):
         for subscriber in self._game_subscribers:
             event_dispatcher.subscribe(subscriber)
 
+        self._logger.debug(f"Creating HoldemPokerGame with game_id {game_id}")
+        # Ensure no trailing comma after score_detector argument
         return HoldemPokerGame(
             self._big_blind,
             self._small_blind,
@@ -1078,5 +1107,5 @@ class HoldemPokerGameFactory(GameFactory):
             game_players=GamePlayers(players),
             event_dispatcher=event_dispatcher,
             deck_factory=DeckFactory(2),
-            score_detector=HoldemPokerScoreDetector(),
+            score_detector=HoldemPokerScoreDetector()
         )

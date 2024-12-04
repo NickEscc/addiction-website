@@ -1,3 +1,4 @@
+<!-- website/Services/logic/game.html -->
 {% extends 'index.html' %}
 {% load static %}
 
@@ -8,6 +9,7 @@
     <main id="main">
         <script type="text/javascript">
             var staticUrl = "{% static 'images/' %}";
+            window.staticUrl = staticUrl; // Ensure window.staticUrl is defined
             var playerId = "{{ player_id|escapejs }}";
             var playerName = "{{ player_name|escapejs }}";
             var playerMoney = "{{ player_money|escapejs|default:'0' }}";
@@ -42,25 +44,34 @@
                     <p>Enjoy your poker game :)</p>
 
                     <div id="current-player" class="player" data-player-id="{{ player_id }}" data-player-name="{{ player_name }}" data-player-money="{{ player_money }}">
-                        <div class="cards"></div>
-                        <div id="player-controls">
-                            <div id="bet-controls" class="controls" style="display: none;">
-                                <div id="fold-cmd-wrapper">
-                                    <button id="fold-cmd" class="btn btn-danger">Fold</button>
-                                </div>
-                                <div id="bet-input-wrapper" style="display: none;">
-                                    <input id="bet-input" type="text" data-slider-min="0" data-slider-max="1000" data-slider-step="1" data-slider-value="0"/>
-                                </div>
-                                <div id="bet-cmd-wrapper" style="display: none;">
-                                    <button id="bet-cmd" class="btn btn-primary">Bet</button>
-                                </div>
-                                <div id="no-bet-cmd-wrapper" style="display: none;">
-                                    <button id="no-bet-cmd" class="btn btn-warning">No Bet</button>
-                                </div>
+                        <div class="cards">
+                            <span class="category"></span>
+                        </div>
+                    </div>
+
+                    <!-- Updated "Start Game" button with custom blue styling -->
+                    <div id="start-game-wrapper" style="display:none; margin-top:10px;">
+                        <button id="start-game-cmd" class="btn btn-custom-blue">Start Game</button>
+                        <p>Press this once all players are in.</p>
+                    </div>
+
+                    <div id="player-controls">
+                        <div id="bet-controls" class="controls" style="display: none;">
+                            <div id="fold-cmd-wrapper">
+                                <button id="fold-cmd" class="btn btn-danger">Fold</button>
                             </div>
-                            <div id="cards-change-controls" class="controls" style="display: none;">
-                                <button id="cards-change-cmd" class="btn btn-primary">Change Cards</button>
+                            <div id="bet-input-wrapper" style="display: none;">
+                                <input id="bet-input" type="text" data-slider-min="0" data-slider-max="1000" data-slider-step="1" data-slider-value="0"/>
                             </div>
+                            <div id="bet-cmd-wrapper" style="display: none;">
+                                <button id="bet-cmd" class="btn btn-primary">Bet</button>
+                            </div>
+                            <div id="no-bet-cmd-wrapper" style="display: none;">
+                                <button id="no-bet-cmd" class="btn btn-warning">No Bet</button>
+                            </div>
+                        </div>
+                        <div id="cards-change-controls" class="controls" style="display: none;">
+                            <button id="cards-change-cmd" class="btn btn-primary">Change Cards</button>
                         </div>
                     </div>
                     <div style="margin-top: 20px;">

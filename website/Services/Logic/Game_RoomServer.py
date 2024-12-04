@@ -1,17 +1,12 @@
 # website/Services/logic/Game_RoomServer.py
-
 import logging
 import asyncio
-import time
 from typing import List, Dict, Optional
 from uuid import uuid4
 from channels.generic.websocket import AsyncConsumer
 from .Player_ClientChannelServer import PlayerServer
 from .PokerGame import GameFactory, GameSubscriber, GameError, Player, HoldemPokerGameFactory
-from .PokerGame import PokerGame  # used in placeholder
-from .PokerGame import GamePlayers, EndGameException, GameError  # if needed
-# from .PokerGame import ... (include all necessary classes that are referenced)
-# We assume GameError, etc. are already imported
+from .PokerGame import PokerGame, EndGameException, GameError
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +23,7 @@ class GameRoom(GameSubscriber):
         self._room_size = 10
         self._logger = logger or logging.getLogger(__name__)
         self.players: Dict[str, PlayerServer] = {}
+        self.start_votes = set()  # Track which players have pressed "Start Game"
 
     async def deactivate(self):
         self.active = False
@@ -42,54 +38,93 @@ class GameRoom(GameSubscriber):
         self.players[player.id] = player
         self._logger.info(f"Player {player.id} joined room {self.id}")
         await self.broadcast_room_update()
-        if len(self.players) >= 2 and not self.active:
-            self._logger.info(f"Enough players in room {self.id}. Starting the game.")
-            asyncio.create_task(self.activate())
+        # Removed automatic game start here. Now requires players to press "Start Game".
+        # if len(self.players) >= 2 and not self.active:
+        #     self._logger.info(f"Enough players in room {self.id}. Starting the game.")
+        #     task = asyncio.create_task(self.activate())
+        #     self._logger.debug(f"activate() task created for room {self.id}: {task}")
 
     async def leave(self, player_id: str):
         if player_id in self.players:
             del self.players[player_id]
+            if player_id in self.start_votes:
+                self.start_votes.remove(player_id)
             self._logger.info(f"Player {player_id} left room {self.id}")
             await self.broadcast_room_update()
 
+    async def player_ready_for_start(self, player_id: str):
+        # Player indicates readiness
+        if player_id in self.players:
+            self.start_votes.add(player_id)
+            self._logger.info(f"Player {player_id} is ready to start in room {self.id}.")
+            await self.broadcast_room_update()
+            # If all players in the room are ready and we have at least two players, start the game
+            if len(self.start_votes) == len(self.players) and len(self.players) >= 2 and not self.active:
+                self._logger.info(f"All players ready in room {self.id}. Starting the game.")
+                task = asyncio.create_task(self.activate())
+                self._logger.debug(f"activate() task created for room {self.id}: {task}")
+        else:
+            self._logger.warning(f"Unknown player {player_id} tried to ready start in room {self.id}")
+
     async def activate(self):
+        self._logger.info(f"Activating room {self.id}")
         self.active = True
         try:
-            self._logger.info(f"Activating room {self.id}")
             dealer_key = -1
             while True:
+                self._logger.debug("Starting a new hand.")
                 await self.remove_inactive_players()
                 if len(self.players) < 2:
+                    self._logger.info("Not enough players to continue. Ending the game.")
                     raise GameError("Not enough players to continue")
+
                 dealer_key = (dealer_key + 1) % len(self.players)
                 dealer_id = list(self.players.keys())[dealer_key]
+                self._logger.info(f"Dealer for this hand is {dealer_id}")
+
                 game = self._game_factory.create_game(list(self.players.values()))
+                self._logger.debug(f"Game instance created: {type(game)} with ID {game._id}")
                 game.event_dispatcher.subscribe(self)
+                self._logger.info("Starting to play hand.")
                 await game.play_hand(dealer_id)
+                self._logger.info("Hand completed.")
                 game.event_dispatcher.unsubscribe(self)
+
         except GameError as e:
             self._logger.error(f"Game error in room {self.id}: {e}")
+        except Exception as e:
+            self._logger.exception(f"Unexpected error in room {self.id}: {e}")
         finally:
             self._logger.info(f"Deactivating room {self.id}")
             self.active = False
+            # Reset start votes after a round/game ends
+            self.start_votes.clear()
             await self.broadcast_game_over()
 
     async def remove_inactive_players(self):
         current_time = asyncio.get_event_loop().time()
+        inactivity_threshold = 60  # seconds
         inactive_players = [
             player_id for player_id, player in self.players.items()
-            if (current_time - time.time()) > 60 or not player.connected  # Adjust inactivity check as needed
+            if (current_time - player.last_active) > inactivity_threshold or not player.connected
         ]
         for player_id in inactive_players:
             self._logger.info(f"Removing inactive player {player_id} from room {self.id}")
             await self.leave(player_id)
 
     async def broadcast_room_update(self):
+        # Indicate if the "Start Game" button should be shown:
+        # Show the button if there are at least 2 players and game not active
+        can_start = (len(self.players) >= 2 and not self.active)
+        ready_players = list(self.start_votes)
+
         message = {
             "message_type": "room-update",
             "event": "update",
             "player_ids": list(self.players.keys()),
             "players": {player_id: p.dto() for player_id, p in self.players.items()},
+            "can_start": can_start,
+            "ready_players": ready_players
         }
         await self.broadcast(message)
 
@@ -190,8 +225,6 @@ class GameServer:
             try:
                 room = await self._join_room(connected_player)
                 self.logger.info(f"Player {connected_player.player.id} joined room {room.id}")
-                if not room.active:
-                    asyncio.create_task(room.activate())
             except Exception as e:
                 self.logger.exception(f"Bad connection: {str(e)}")
 
@@ -208,7 +241,6 @@ class GameServer:
 class GameRoomConsumer(AsyncConsumer):
     """
     This consumer won't accept WebSocket connections. It's used to manage players joining/leaving via channel layer.
-    Ensure that you have a channel layer configured (e.g., channels_redis).
     """
     async def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -241,7 +273,7 @@ class GameRoomConsumer(AsyncConsumer):
             'player_name': player_name,
             'player_money': player_money,
             'session_id': session_id,
-            'last_pong': time.time(),
+            'last_pong': asyncio.get_event_loop().time(),
         }
         self._logger.info(f"Player {player_id} added to GameRoom {self.room_id}")
         await self.broadcast_room_update()
@@ -268,7 +300,7 @@ class GameRoomConsumer(AsyncConsumer):
 
     async def handle_pong(self, player_id):
         if player_id in self.players:
-            self.players[player_id]['last_pong'] = time.time()
+            self.players[player_id]['last_pong'] = asyncio.get_event_loop().time()
             self._logger.debug(f"Received pong from player {player_id}")
 
     async def broadcast(self, message):
