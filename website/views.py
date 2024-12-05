@@ -9,3 +9,6 @@ def HowToPlay(request):
 
 def HowItWorks(request):
     return render(request, 'website/HowItWorks.html')
+
+def SignUp(request):
+    return render (request, 'website/SignUp.html')

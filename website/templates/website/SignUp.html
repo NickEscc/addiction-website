@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up for Poker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #f8c301;
+        }
+        form {
+            background-color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        input {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #f8c301;
+            color: #121212;
+            padding: 10px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #ff8700;
+        }
+        .error {
+            color: red;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign Up to Play Poker</h1>
+    <form id="signup-form">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" name="dob" required>
+
+        <button type="submit">Sign Up</button>
+
+        <div id="error-message" class="error"></div>
+    </form>
+
+    <script>
+        document.getElementById('signup-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get the user's date of birth
+            const dob = new Date(document.getElementById('dob').value);
+            const today = new Date();
+            const age = today.getFullYear() - dob.getFullYear();
+            const month = today.getMonth() - dob.getMonth();
+            const day = today.getDate() - dob.getDate();
+
+            // Check if the user is 21 or older
+            let isOldEnough = false;
+            if (age > 21 || (age === 21 && month > 0) || (age === 21 && month === 0 && day >= 0)) {
+                isOldEnough = true;
+            }
+
+            if (isOldEnough) {
+                // Proceed with sign up (send data to the backend)
+                alert("You are old enough to play!");
+                // Here you can submit the form data or make a request to the backend.
+            } else {
+                // Show error message if the user is not 21 or older
+                document.getElementById('error-message').textContent = "You must be at least 21 years old to sign up.";
+            }
+        });
+    </script>
+</body>
+</html>
