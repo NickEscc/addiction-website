@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'website',
+
+    'users', #Add users here
 ]
 # CHANNEL_LAYERS = {
 #     'default': {
