@@ -26,6 +26,7 @@
             padding: 50px 20px;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
 
         header h1 {
@@ -36,6 +37,27 @@
             letter-spacing: 2px;
             text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
         }
+
+        .home-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #ff8700;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* This removes the underline */
+}
+
+.home-button:hover {
+    background-color: #f8c301;
+}
 
         /* Main Content Area */
         main {
@@ -137,6 +159,8 @@
 <body>
 
     <header>
+        <!-- Home Button -->
+        <a href="{% url 'home' %}" class="home-button">Home</a>
         <h1>How to Play Poker</h1>
     </header>
 
@@ -245,4 +269,7 @@ nextBtn.addEventListener('click', () => {
 
 // Initial call to show the first ranking
 showRanking(currentIndex);
-        
+    </script>
+
+</body>
+</html>

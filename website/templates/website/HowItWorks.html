@@ -26,6 +26,7 @@
             padding: 50px 20px;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
 
         header h1 {
@@ -35,6 +36,27 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Button Styling */
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #ff8700;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
+        }
+
+        .home-button:hover {
+            background-color: #f8c301;
         }
 
         /* Main Content Area */
@@ -81,6 +103,10 @@
 <body>
 
     <header>
+        <!-- Home Button -->
+        <a href="{% url 'home' %}">
+            <button class="home-button">Home</button>
+        </a>
         <h1>How the Middleman Works</h1>
     </header>
 
@@ -115,11 +141,7 @@
             </ul>
         </section>
 
-        <!-- Summary Section -->
-        <section>
-            <h2>Summary</h2>
-            <p>By using Stripe as our payment processor, the middleman ensures that both players’ money is securely handled before, during, and after the game. This system removes any potential conflict, guaranteeing that players’ funds are safely managed and that the winner is paid promptly at the end of the game.</p>
-        </section>
+       
     </main>
 
     <footer>
