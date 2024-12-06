@@ -967,10 +967,11 @@ class HoldemPokerGame(PokerGame):
     BET_TIMEOUT = 30
     WAIT_AFTER_FLOP_TURN_RIVER = 1
 
-    def __init__(self, big_blind, small_blind, *args, **kwargs):
+    def __init__(self, big_blind, small_blind, logger: Optional[logging.Logger] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._big_blind = big_blind
         self._small_blind = small_blind
+        self._logger = logger or logging.getLogger(__name__)
 
     async def _add_shared_cards(self, new_shared_cards, scores):
         await self._event_dispatcher.shared_cards_event(new_shared_cards)

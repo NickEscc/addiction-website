@@ -5,6 +5,7 @@ import logging
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from website.Services.Logic.Player_ClientChannelServer import PlayerServer
+from website.Services.Logic.Game_RoomServer import GameRoomFactory
 from website.Services.Logic.Game_server_instance import get_game_server_instance
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
 
         self.room_id = None
         self.player_server = None
+        self.game_room_server = None
         self.player_name = None
         self.player_money = None
         self.room_group_name = None
@@ -101,6 +103,10 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
             money=self.player_money,
             logger=logger
         )
+        if self.room_id:
+            self.game_room_server = await game_server_instance._join_private_room(self.player_server, self.room_id)
+        else:
+            self.game_room_server = await game_server_instance._join_any_public_room(self.player_server)
 
         game_server_instance.add_new_player(self.player_server, room_id=self.room_id)
         logger.info(f"Player {self.player_id} added to GameServer.")
@@ -122,6 +128,10 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
         game_server_instance = get_game_server_instance()
         if game_server_instance is None:
             return
+
+        print(game_server_instance)
+        print("Game server rooms", game_server_instance._rooms)
+
         room = next((r for r in game_server_instance._rooms if r.id == self.room_id), None)
         if room:
             await room.player_ready_for_start(self.player_id)
@@ -149,16 +159,22 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
 
     async def send_room_update(self):
         players_in_room = list(self.rooms[self.room_id].values())
+        can_start = len(players_in_room) > 1
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 "type": "room_update",
-                "players": players_in_room
+                "players": players_in_room,
+                "can_start": can_start
             }
         )
 
     async def room_update(self, event):
-        await self.send_json({"message_type": "room-update", "players": event["players"]})
+        await self.send_json(
+            {"message_type": "room-update",
+             "players": event["players"],
+             "can_start": event["can_start"]
+             })
 
     async def player_left(self, event):
         await self.send_json({

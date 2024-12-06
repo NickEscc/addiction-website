@@ -103,7 +103,7 @@ class GameRoom(GameSubscriber):
 
     async def remove_inactive_players(self):
         current_time = asyncio.get_event_loop().time()
-        inactivity_threshold = 60  # seconds
+        inactivity_threshold = 120  # seconds
         inactive_players = [
             player_id for player_id, player in self.players.items()
             if (current_time - player.last_active) > inactivity_threshold or not player.connected
@@ -136,7 +136,10 @@ class GameRoom(GameSubscriber):
         await self.broadcast(message)
 
     async def broadcast(self, message):
-        await asyncio.gather(*(p.send_message(message) for p in self.players.values()))
+        try:
+            await asyncio.gather(*(p.send_message(message) for p in self.players.values()), return_exceptions=True)
+        except Exception as e:
+            self._logger.error(f"Error in broadcast: {e}")
 
     async def game_event(self, event, event_data):
         # Handle game events and send messages to players

@@ -50,8 +50,13 @@ class PlayerServer(Player):
         if not self._connected or self._channel is None:
             self._logger.error(f"Cannot send message, player {self.id} not connected or channel missing.")
             return
-        await self._channel.send_json(message)
-        self._logger.debug(f"Message sent to player {self.id}: {message}")
+
+        try:
+            await self._channel.send_json(message)
+            self._logger.debug(f"Message sent to player {self.id}: {message}")
+        except Exception as e:
+            self._logger.error(f"Failed to send message to player {self.id}: {e}")
+            self._connected = False
 
     async def recv_message(self, timeout_epoch: Optional[float] = None) -> Any:
         if not self._connected or self._channel is None:

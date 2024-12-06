@@ -183,7 +183,7 @@ var PyPoker = {
         
                 // Set each card's rank and suit
                 player.cards.forEach(function(card, index) {
-                    let $card = $cardsContainer.find('.card[data-key=' + index + '"]');
+                    let $card = $cardsContainer.find('.card[data-key="' + index + '"]');
                     PyPoker.Game.setCard($card, card.rank, card.suit);
                 });
         
@@ -545,6 +545,22 @@ var PyPoker = {
         }
     },
 
+    Logger: {
+        log: function(text) {
+            let $p0 = $('#game-status p[data-key="0"]');
+            let $p1 = $('#game-status p[data-key="1"]');
+            let $p2 = $('#game-status p[data-key="2"]');
+            let $p3 = $('#game-status p[data-key="3"]');
+            let $p4 = $('#game-status p[data-key="4"]');
+
+            $p4.text($p3.text());
+            $p3.text($p2.text());
+            $p2.text($p1.text());
+            $p1.text($p0.text());
+            $p0.text(text);
+        }
+    },
+
     init: function() {
         if (typeof roomId === 'undefined' || !roomId) {
             console.error("roomId is not defined.");
@@ -640,7 +656,7 @@ var PyPoker = {
                 'message_type': 'start-game'
             }));
             PyPoker.Logger.log("You signaled to start the game.");
-            // Optionally, disable the button after clicking
+            // Disable the button after clicking to prevent multiple clicks
             $(this).prop('disabled', true).text('Waiting for others...');
         });
 
