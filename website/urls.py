@@ -6,4 +6,5 @@ urlpatterns = [
     path('HowToPlay/', views.HowToPlay, name='HowToPlay'), #How To Play page
     path('HowItWorks/', views.HowItWorks, name='HowItWorks'), #How It Works page
     path('SignUp/', views.SignUp, name='SignUp'), #Sign Up page
+    path('Login', views.Login, name='Login'), #Login Page
 ]
