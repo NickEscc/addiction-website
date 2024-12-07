@@ -1,0 +1,6 @@
+<h2>Game Room: {{ game.game_code }}</h2>
+<p>Players: {% for player in game.players.all %}{{ player.username }}{% endfor %}</p>
+<p>Pot: ${{ game.pot }}</p>
+<p>Log: {{ game.game_log }}</p>
+<p>Start Time: {{ game.start_time }}</p>
+<p>End Time: {{ game.end_time }}</p>

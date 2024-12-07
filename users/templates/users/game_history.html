@@ -1,0 +1,14 @@
+<h2>Game History</h2>
+<ul>
+    {% for game in games %}
+        <li>
+            <strong>Game {{ game.id }}</strong><br>
+            Start: {{ game.start_time }} | End: {{ game.end_time }}<br>
+            Winner: {{ game.winner.username if game.winner else "N/A" }}<br>
+            Pot: ${{ game.pot }}<br>
+            Log: {{ game.game_log }} <!-- If you add a game_log field -->
+        </li>
+    {% empty %}
+        <li>No games found.</li>
+    {% endfor %}
+</ul>

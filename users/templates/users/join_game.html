@@ -1,0 +1,7 @@
+<h2>Join a Game Room</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label for="game_code">Enter Game Code:</label>
+    <input type="text" name="game_code" id="game_code" required>
+    <button type="submit">Join Game</button>
+</form>

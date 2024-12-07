@@ -1,0 +1,13 @@
+<h2>Transaction History</h2>
+<ul>
+    {% for transaction in transactions %}
+        <li>
+            Type: {{ transaction.transaction_type }}<br>
+            Amount: ${{ transaction.amount }}<br>
+            Stripe ID: {{ transaction.stripe_transaction_id }}<br>
+            Timestamp: {{ transaction.timestamp }}
+        </li>
+    {% empty %}
+        <li>No transactions found.</li>
+    {% endfor %}
+</ul>
