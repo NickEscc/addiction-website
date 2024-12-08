@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to Play Poker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #f8c301;
+        }
+        form {
+            background-color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        input {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #f8c301;
+            color: #121212;
+            padding: 10px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #ff8700;
+        }
+        .error {
+            color: red;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+        .social-login {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        .social-login button {
+            background-color: #1f49a3; /* Facebook color */
+            border-radius: 5px;
+        }
+        .social-login button:hover {
+            background-color: #365899; /* Darker shade on hover */
+        }
+        
+    </style>
+</head>
+<body>
+
+    <h1>Login to Play Poker</h1>
+
+    <!-- Login Form -->
+    <form method="POST" action="{% url 'Login' %}">
+        {% csrf_token %}
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Login</button>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </form>
+
+    <!-- Social Login Buttons -->
+    <div class="social-login">
+        <button class="facebook-login" onclick="window.location.href='/auth/facebook'">Login with Facebook</button>
+        <button class="google-login" onclick="window.location.href='/auth/google'">Login with Google</button>
+        <button class="apple-login" onclick="window.location.href='/auth/apple'">Login with Apple</button>
+    </div>
+
+    <p>Don't have an account? <a href="{% url 'SignUp' %}">Sign up here</a></p>
+
+</body>
+</html>
