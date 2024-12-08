@@ -1,0 +1,10 @@
+<h2>Deposit Money</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="amount">Amount to Deposit:</label>
+    <input type="number" step="0.01" name="amount" id="amount" required>
+    <button type="submit">Deposit</button>
+</form>
+{% for message in messages %}
+    <p>{{ message }}</p>
+{% endfor %}

@@ -59,7 +59,8 @@ def monitor_rooms(redis_client, logger):
                 continue
 
             if action == "player_joined":
-                # Handle player joined if necessary
+                # Handle player joined if necessary 
+                #i doubt we will need this to start, once a player joins they will be in the game until it is over
                 pass
             elif action == "player_left":
                 # Handle player left if necessary

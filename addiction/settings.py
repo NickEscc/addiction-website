@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'website.CustomUser'
+LOGIN_URL = '/login/'
 
 # Application definition
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -108,7 +110,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-LOGIN_REDIRECT_URL = 'game' 
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
 
 # Password validation

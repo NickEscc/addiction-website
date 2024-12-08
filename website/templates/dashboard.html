@@ -1,0 +1,23 @@
+<h2>Welcome to Your Dashboard</h2>
+<p>Your Balance: ${{ balance }}</p>
+
+<a href="{% url 'create_game' %}">Create a New Game</a>
+<form method="post" action="{% url 'deposit_money' %}">
+    {% csrf_token %}
+    <label for="amount">Add Balance:</label>
+    <input type="number" step="0.01" name="amount" id="amount" required>
+    <button type="submit">Add Balance</button>
+</form>
+
+<h3>Active Games</h3>
+<ul>
+    {% for game in games %}
+        <li>
+            {{ game.name }} - Entry Fee: ${{ game.entry_fee }}
+            <form method="post" action="{% url 'join_game' game.id %}">
+                {% csrf_token %}
+                <button type="submit">Join Game</button>
+            </form>
+        </li>
+    {% endfor %}
+</ul>

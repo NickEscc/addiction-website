@@ -12,16 +12,77 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.safestring import mark_safe
 import json
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
+from django.contrib import messages
+from django.db import transaction
 
 from website.Services.Logic.channel import ChannelError, MessageFormatError, MessageTimeout
 from website.Services.Logic.player import Player
 from website.Services.Logic.player_client import PlayerClientConnector
 
+from .models import Game
+from decimal import Decimal
+from .forms import GameForm
+from django.contrib import messages
+
+
 # Redis configuration
 redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
 redis_client = redis.from_url(redis_url)
 
+@login_required
+def create_game(request):
+    if request.method == 'POST':
+        form = GameForm(request.POST)
+        if form.is_valid():
+            game = form.save(commit=False)
+            game.created_by = request.user
+            game.save()
+            messages.success(request, 'Game created successfully!')
+            return redirect('dashboard')  # Redirect to dashboard after creation
+    else:
+        form = GameForm()
+    return render(request, 'create_game.html', {'form': form})
 
+@login_required
+def dashboard(request):
+    # Fetch the user's balance and the list of active games
+    user_balance = request.user.balance  # Assuming `CustomUser` has a `balance` field
+    active_games = Game.objects.all()  # Fetch all active games
+    return render(request, 'dashboard.html', {'balance': user_balance, 'games': active_games})
+
+@login_required
+@transaction.atomic
+def join_game(request, game_id):
+    game = Game.objects.get(id=game_id)
+    try:
+        game.join_game(request.user)
+        messages.success(request, f"Successfully joined the game: {game.name}")
+    except ValueError as e:
+        messages.error(request, f"Could not join game: {e}")
+    return redirect('dashboard')  # Replace with your desired redirect
+
+# Create a new player client connector
+
+@login_required
+@transaction.atomic
+def deposit_money(request):
+    if request.method == 'POST':
+        amount = request.POST.get('amount')
+        try:
+            amount = float(amount)
+            if amount <= 0:
+                raise ValueError("Amount must be positive.")
+            request.user.balance += Decimal(amount)
+            request.user.save()
+            messages.success(request, f"Successfully added ${amount:.2f} to your balance.")
+        except ValueError as e:
+            messages.error(request, f"Invalid amount: {e}")
+    return redirect('dashboard')
+
+class CustomLoginView(LoginView):
+    template_name = 'registration/login.html'
 
 def index(request):
     """
