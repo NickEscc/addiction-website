@@ -10,6 +10,7 @@ from .Logic.PokerGame import HoldemPokerGameFactory
 from .Logic.Game_RoomServer import GameRoomFactory, GameServer
 from .Logic.Game_server_instance import set_game_server_instance
 from typing import Optional
+# python3 -m website.Services.texasholdem_poker_service
 
 # Configure the logger
 logger = logging.getLogger("TexasHoldemServer")

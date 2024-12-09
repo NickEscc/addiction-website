@@ -16,7 +16,7 @@
     <style>
         /* Body Styling */
         body {
-            background-color: white;
+            background-color: black;
             color: black;
             font-family: Arial, sans-serif;
             margin: 0;
@@ -62,7 +62,7 @@
 
         /* Button Styling for Navigation Links */
         .nav-btn {
-            background-color: #FFAA00; /* Orange background */
+            background-color: #FF0000; /* Orange background */
             color: white; /* White text */
             padding: 10px 20px;
             border-radius: 5px;
@@ -73,7 +73,7 @@
         }
 
         .nav-btn:hover {
-            background-color: #FF7F00; /* Darker orange on hover */
+            background-color: #FF0000; /* Darker orange on hover */
         }
 
         /* Centered "Must be 21 to play" text */
@@ -82,6 +82,49 @@
             color: #FFAA00;  /* Gold color */
             margin-top: 50px;  /* Add space below the navigation bar */
         }
+
+
+        @font-face {
+            font-family: 'Neon Glow';
+            src: url('https://assets.codepen.io/230569/NeonGlow-8VLz.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+          }
+
+        .intro {
+    font-family: 'Neon Glow', sans-serif; /* Apply Neon Glow font */
+    font-size: 200px; /* Make the text large */
+    color: #FF0000; /* Red color */
+    text-align: center;
+    margin-top: 100px; /* Adjust spacing from the top */
+    animation: glow 1.5s infinite alternate;
+    text-shadow:
+        0 0 10px #FF0000,
+        0 0 20px #FF0000,
+        0 0 30px #FF0000,
+        0 0 40px #FF0000,
+        0 0 50px #FF0000;
+}
+
+/* Glow Animation */
+@keyframes glow {
+    from {
+        text-shadow:
+            0 0 10px #FF0000,
+            0 0 20px #FF0000,
+            0 0 30px #FF0000,
+            0 0 40px #FF0000,
+            0 0 50px #FF0000;
+    }
+    to {
+        text-shadow:
+            0 0 20px #FF3333,
+            0 0 30px #FF3333,
+            0 0 40px #FF3333,
+            0 0 50px #FF3333,
+            0 0 60px #FF3333;
+    }
+}
     </style>
 </head>
 <body>
@@ -106,15 +149,15 @@
 
         <!-- Right side links (Login and Sign Up) -->
         <div>
-            <a href="{% url 'login' %}" class="nav-btn">Login</a>
+            <a href="{% url 'login' %}" class="nav-btn">Play Game</a>
             <a href="{% url 'join' %}" class="nav-btn">Sign Up</a>            {% comment %} <a href="signup.html" class="nav-btn">Sign Up</a> {% endcomment %}
         </div>
     </nav>
 
-    <!-- Centered "Must be 21 to play" text -->
-    <div class="must-be-21">
-        Must be 21 to play
-    </div>
+    <div class="intro">
+        Poker Game
+
+</div>
 
 </body>
 </html>
