@@ -5,10 +5,6 @@
   "scripts": {
     "start": "node app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/geobalas/Poker"
-  },
   "dependencies": {
     "body-parser": "^1.20.3",
     "connect": "^3.7.0",
