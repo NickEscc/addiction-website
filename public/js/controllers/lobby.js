@@ -28,4 +28,5 @@ app.controller('LobbyController', ['$scope', '$rootScope', '$http', function( $s
 			});
 		}
 	}
+
 }]);

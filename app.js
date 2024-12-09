@@ -44,9 +44,24 @@ var port = process.env.PORT || 3000;
 server.listen(port);
 console.log('Listening on port ' + port);
 
+// The homepage
+app.get('/', (req, res) => {
+    res.render('new_home'); // Render the new home page
+});
+
 // The lobby
-app.get('/', function( req, res ) {
-	res.render('index');
+app.get(['/play-now', '/play-now.html'], (req, res) => {
+    res.render('index'); // Render the original home page
+});
+
+// Route for "How to Play"
+app.get('/HowToPlay', (req, res) => {
+    res.render('how_to_play'); // Render the "How to Play" page
+});
+
+// Route for "How It Works"
+app.get('/HowItWorks', (req, res) => {
+    res.render('how_it_works'); // Render the "How It Works" page
 });
 
 // The lobby data (the array of tables and their data)
@@ -431,7 +446,7 @@ function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-tables[0] = new Table( 0, '10-handed Table', eventEmitter(0), 10, 2, 1, 200, 40, false );
-tables[1] = new Table( 1, '6-handed Table', eventEmitter(1), 6, 4, 2, 400, 80, false );
-tables[2] = new Table( 2, '2-handed Table', eventEmitter(2), 2, 8, 4, 800, 160, false );
-tables[3] = new Table( 3, '6-handed Private Table', eventEmitter(3), 6, 20, 10, 2000, 400, true );
+tables[0] = new Table( 0, 'Sample 10-handed Table', eventEmitter(0), 10, 2, 1, 200, 40, false );
+tables[1] = new Table( 1, 'Sample 6-handed Table', eventEmitter(1), 6, 4, 2, 400, 80, false );
+tables[2] = new Table( 2, 'Sample 2-handed Table', eventEmitter(2), 2, 8, 4, 800, 160, false );
+tables[3] = new Table( 3, 'Sample 6-handed Private Table', eventEmitter(3), 6, 20, 10, 2000, 400, true );

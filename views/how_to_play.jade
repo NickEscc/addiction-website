@@ -1,0 +1,231 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title How to Play Poker
+    link(href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap', rel='stylesheet')
+    style.
+      /* General Body Styling */
+      body {
+      background: linear-gradient(135deg, #121212 0%, #333333 100%);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.8;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      }
+      /* Header Styling */
+      header {
+      background: linear-gradient(135deg, #f8c301 0%, #ff8700 100%);
+      padding: 50px 20px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      position: relative;
+      }
+      header h1 {
+      font-size: 3em;
+      margin: 0;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+      }
+      .home-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #ff8700;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s ease;
+      text-decoration: none; /* This removes the underline */
+      }
+      .home-button:hover {
+      background-color: #f8c301;
+      }
+      /* Main Content Area */
+      main {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 40px;
+      background-color: #222222;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      }
+      section {
+      margin-bottom: 30px;
+      }
+      h2 {
+      font-size: 2.5em;
+      color: #f8c301;
+      border-bottom: 3px solid #f8c301;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      }
+      p, ul {
+      font-size: 1.2em;
+      color: #e0e0e0;
+      }
+      ul {
+      padding-left: 20px;
+      margin-top: 10px;
+      }
+      li {
+      margin: 12px 0;
+      line-height: 1.6;
+      }
+      /* Hand Rankings Styling */
+      .hand-ranking {
+      display: none;
+      padding: 20px;
+      background: #333;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+      .hand-ranking img {
+      max-width: 100%;
+      border-radius: 8px;
+      }
+      .hand-ranking h3 {
+      color: #f8c301;
+      margin: 0 0 10px 0;
+      }
+      /* Arrow Navigation Buttons */
+      .nav-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      }
+      .nav-button {
+      background-color: #f8c301;
+      color: #121212;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      font-weight: 600;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      }
+      .nav-button:hover {
+      background-color: #ff8700;
+      }
+      .nav-button:disabled {
+      background-color: #444;
+      cursor: not-allowed;
+      }
+      /* Footer Styling */
+      footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #1f1f1f;
+      position: relative;
+      margin-top: 40px;
+      font-size: 1.1em;
+      color: #d1d1d1;
+      }
+  body
+    header
+      // Home Button
+      a(href="/")
+        button.home-button Home
+      h1 How to Play Poker
+    main
+      // Introduction Section
+      section
+        h2 Introduction to Poker
+        p
+          | Poker is a popular card game that combines skill, strategy, and luck. The objective of the game is to form the best possible five-card hand from the cards dealt to you and the community cards available. Players bet chips based on the strength of their hands, and the one with the best hand or the last person standing wins the pot.
+      // How the Game Works Section
+      section
+        h2 How the Game Works
+        p
+          | In poker, each player is dealt two private cards (known as hole cards) and can use five community cards placed face-up on the table. The objective is to make the best possible five-card hand using any combination of the seven available cards. Players can bet, raise, fold, or check depending on the round.
+      // Hand Rankings Section
+      section
+        h2 Hand Rankings
+        // Hand Rankings Content
+        #royal-flush.hand-ranking
+          h3 Royal Flush
+          img(src='https://www.888poker.com/magazine/sites/magazine.888poker.com/files/inline-images/Royal-Flush.webp', alt='Royal Flush')
+          p A, K, Q, J, 10, all of the same suit.
+        #straight-flush.hand-ranking
+          h3 Straight Flush
+          img(src='https://www.888poker.com/magazine/sites/magazine.888poker.com/files/inline-images/Straight-Flush.webp', alt='Straight Flush')
+          p Five consecutive cards of the same suit.
+        #four-of-a-kind.hand-ranking
+          h3 Four of a Kind
+          img(src='https://www.888poker.com/magazine/sites/magazine.888poker.com/files/inline-images/Four-of-a-Kind.webp', alt='Four of a Kind')
+          p Four cards of the same rank.
+        #full-house.hand-ranking
+          h3 Full House
+          img(src='https://www.888poker.com/magazine/sites/magazine.888poker.com/files/inline-images/Full-House.webp', alt='Full House')
+          p Three of a kind and a pair.
+        // Navigation Buttons
+        .nav-buttons
+          button#prev-btn.nav-button(disabled='') Back
+          button#next-btn.nav-button Next
+      // Betting Rounds Section
+      section
+        h2 Betting Rounds
+        p
+          | There are four betting rounds in Texas Hold&apos;em: Pre-Flop, Flop, Turn, and River. In each round, players have the option to bet, check, raise, or fold based on their cards and the community cards. The betting rounds provide players the opportunity to evaluate their hands and adjust their strategy accordingly.
+      // Poker Tips Section
+      section
+        h2 Poker Tips
+        ul
+          li
+            strong Pay attention to your opponents:
+            |  Watching how others play can give you insight into their strategy.
+          li
+            strong Don&rsquo;t play too many hands:
+            |  Be selective with the hands you play to avoid losing chips unnecessarily.
+          li
+            strong Know when to fold:
+            |  Don&rsquo;t be afraid to fold a hand if you think you&rsquo;re beaten.
+          li
+            strong Use position to your advantage:
+            |  Players acting later in the betting rounds have more information to make decisions.
+    footer
+      p &copy; 2024 Poker Obsession | All Rights Reserved
+    script.
+      // JavaScript to control the Hand Rankings navigation
+      let currentIndex = 0;
+      const rankings = document.querySelectorAll('.hand-ranking');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      // Function to show the current ranking
+      function showRanking(index) {
+      // Hide all rankings
+      rankings.forEach(ranking => ranking.style.display = 'none');
+      // Show the current ranking
+      rankings[index].style.display = 'block';
+      // Update button states
+      prevBtn.disabled = index === 0; // Disable prev if it's the first ranking
+      nextBtn.disabled = index === rankings.length - 1; // Disable next if it's the last ranking
+      }
+      // Event listeners for navigation buttons
+      prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+      currentIndex--;
+      showRanking(currentIndex);
+      }
+      });
+      nextBtn.addEventListener('click', () => {
+      if (currentIndex < rankings.length - 1) {
+      currentIndex++;
+      showRanking(currentIndex);
+      }
+      });
+      // Initial call to show the first ranking
+      showRanking(currentIndex);

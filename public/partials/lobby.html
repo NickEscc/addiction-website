@@ -1,4 +1,5 @@
 <div id="lobby">
+
 	<div class="modal-wrap" ng-show="!$root.screenName">
 		<div class="modal">
 			<form ng-submit="register()">
@@ -12,8 +13,8 @@
 	</div>
 	<table id="table-list">
 		<tr>
-			<th class="dark-border">Size</th>
-			<th class="dark-border">Big Blind / Small Blind</th>
+			<th class="dark-border">Name</th>
+			<th class="dark-border">BB/SB</th>
 			<th>Players</th>
 		</tr>
 		<tr ng-repeat="table in lobbyTables">
