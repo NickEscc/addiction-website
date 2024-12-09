@@ -1,31 +1,209 @@
 {% extends 'index.html' %}
+{% comment %} website/templates/website/login.html {% endcomment %}
+{% load static %}
 
-{% block title %}Login - Python Games{% endblock %}
+{% block title %}Join Game - Poker Addiction{% endblock %}
 
 {% block content %}
-<div class="container">
-    <main id="main">
-        <h1 style="text-align: center; color: black;">Welcome to Addiction!</h1>
+<style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
-        {% if error %}
-            <div class="alert alert-danger">{{ error }}</div>
-        {% endif %}
+    body {
+        background-color: #121212;
+        {% comment %} background-image: url("{% static 'images/poker_background.jpg' %}"); /* Optional: Add a poker-themed background image */ {% endcomment %}
+        background-size: cover;
+        background-position: center;
+        font-family: 'Orbitron', sans-serif;
+        color: #fff;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        <form id="join-form" action="{% url 'join' %}" method="post">
-            {% csrf_token %}
-            <div id="login-bar">
-                <div class="form-group">
-                    <input type="text" class="form-control input-lg" name="name" placeholder="Your name" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control input-lg" name="room_id" placeholder="Room ID (optional)">
-                    <small class="form-text text-muted">Leave this blank to join any available room</small>
-                </div>
-                <div class="form-group">
-                    <button class="btn btn-primary btn-lg login-link" type="submit">Start Playing</button>
-                </div>
-            </div>
-        </form>
-    </main>
+    .join-container {
+        background: rgba(0, 0, 0, 0.8);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(0, 255, 255, 0.5);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+    }
+
+    .join-container::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 20px;
+        background: linear-gradient(45deg, #ff0000, #00ffff, #ff0000);
+        z-index: -1;
+        filter: blur(20px);
+    }
+
+    .join-container h2 {
+        margin-bottom: 20px;
+        font-size: 32px;
+        color: #ff0000;
+        text-shadow:
+            0 0 5px #ff0000,
+            0 0 10px #ff0000,
+            0 0 20px #ff0000,
+            0 0 40px #00ffff;
+        animation: neonGlow 1.5s ease-in-out infinite alternate;
+    }
+
+    .join-container p {
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: #ffffff;
+        text-shadow: 0 0 5px #00ffff;
+    }
+
+    .join-container a {
+        color: #00ffff;
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.3s ease;
+    }
+
+    .join-container a:hover {
+        color: #ff0000;
+    }
+
+    .join-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .join-form .form-group {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .join-form input[type="text"] {
+        width: 100%;
+        padding: 12px 20px;
+        border: 2px solid #00ffff;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 16px;
+        outline: none;
+        transition: border 0.3s ease;
+        text-shadow: 0 0 5px #00ffff;
+    }
+
+    .join-form input[type="text"]::placeholder {
+        color: #ffffff;
+        opacity: 0.7;
+        text-shadow: none;
+    }
+
+    .join-form input[type="text"]:focus {
+        border: 2px solid #ff0000;
+    }
+
+    .join-form button {
+        width: 100%;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #ff0000;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow:
+            0 0 5px #ff0000,
+            0 0 10px #ff0000,
+            0 0 20px #ff0000,
+            0 0 40px #ff0000;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .join-form button:hover {
+        background: #cc0000;
+        box-shadow:
+            0 0 10px #ff0000,
+            0 0 20px #ff0000,
+            0 0 30px #ff0000,
+            0 0 50px #ff0000;
+    }
+
+    .errorlist {
+        background: rgba(255, 0, 0, 0.8);
+        color: #fff;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        list-style: none;
+        text-align: left;
+        font-weight: bold;
+    }
+
+    @keyframes neonGlow {
+        from {
+            text-shadow:
+                0 0 5px #ff0000,
+                0 0 10px #ff0000,
+                0 0 20px #ff0000,
+                0 0 40px #00ffff;
+        }
+        to {
+            text-shadow:
+                0 0 10px #ff0000,
+                0 0 20px #ff0000,
+                0 0 30px #ff0000,
+                0 0 50px #00ffff;
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+        .join-container {
+            padding: 30px 20px;
+        }
+
+        .join-container h2 {
+            font-size: 28px;
+        }
+
+        .join-form button {
+            font-size: 16px;
+            padding: 10px 16px;
+        }
+    }
+</style>
+
+<div class="join-container">
+    <h2>Join the Game</h2>
+    {% comment %} <p>If you don't have an account, please <a href="{% url 'account_signup' %}">Sign Up</a> first.</p> {% endcomment %}
+
+    {% if error %}
+        <ul class="errorlist">
+            <li>{{ error }}</li>
+        </ul>
+    {% endif %}
+
+    <form id="join-form" class="join-form" action="{% url 'join' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="text" name="name" placeholder="Your Name" required>
+        </div>
+        <div class="form-group">
+            <input type="text" name="room_id" placeholder="Room ID (optional)">
+            <small style="color: #00ffff; font-size: 12px;">Leave this blank to join any available room</small>
+        </div>
+        <div class="form-group">
+            <button type="submit">Start Playing</button>
+        </div>
+    </form>
 </div>
 {% endblock %}

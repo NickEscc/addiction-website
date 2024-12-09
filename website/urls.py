@@ -1,15 +1,12 @@
 # website/urls.py
-
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),  # Home page
     path('index/', views.index, name='index'),
-
-    path('HowToPlay/', views.HowToPlay, name='HowToPlay'),  # How To Play page
-    path('login/', views.login, name='login'),  # Login page
-    path('join/', views.join, name='join'),  # Join logic
-    path('game/', views.game, name='game'),  # Poker game
-    path('logout/', views.logout_view, name='logout'),
+    path('accounts/', include('allauth.urls')),  # allauth's own signup/login/logout
+    
+    path('join/', views.join, name='join'),  # New route for pre-game setup page
+    path('game/', views.game, name='game'),
 ]

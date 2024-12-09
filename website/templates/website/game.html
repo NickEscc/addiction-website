@@ -1,4 +1,4 @@
-<!-- website/Services/logic/game.html -->
+<!-- website/templates/website/game.html -->
 {% extends 'index.html' %}
 {% load static %}
 
@@ -74,9 +74,9 @@
                             <button id="cards-change-cmd" class="btn btn-primary">Change Cards</button>
                         </div>
                     </div>
-                    <div style="margin-top: 20px;">
+                    {% comment %} <div style="margin-top: 20px;">
                         <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
             </div>
         </div>
