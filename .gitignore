@@ -1,16 +1,15 @@
-# Ignore Python bytecode files
-*.pyc
-__pycache__/
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
 
-# Ignore Django migrations
-*/migrations/
+pids
+logs
+results
 
-# Ignore virtual environment folders
-venv/
-myenv/
-
-# Ignore database files
-*.sqlite3
-
-# Ignore VS Code settings
-.vscode/
+npm-debug.log
+node_modules

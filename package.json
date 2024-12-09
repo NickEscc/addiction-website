@@ -1,0 +1,24 @@
+{
+  "name": "Poker",
+  "version": "0.0.1",
+  "private": false,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geobalas/Poker"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "connect": "^3.7.0",
+    "errorhandler": "^1.5.1",
+    "express": "^4.21.2",
+    "jade": "^0.29.0",
+    "less": "^2.7.1",
+    "less-middleware": "^2.2.1",
+    "morgan": "^1.10.0",
+    "serve-favicon": "^2.5.0",
+    "socket.io": "^4.8.1"
+  }
+}
