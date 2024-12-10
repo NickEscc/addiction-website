@@ -1,25 +1,20 @@
 {% extends 'index.html' %}
-{% comment %} website/templates/website/login.html {% endcomment %}
 {% load static %}
 
 {% block title %}Join Game - Poker Addiction{% endblock %}
 
-{% block content %}
+{% block extra_head %}
 <style>
-    /* Import Google Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
     body {
-        background-color: #121212;
-        {% comment %} background-image: url("{% static 'images/poker_background.jpg' %}"); /* Optional: Add a poker-themed background image */ {% endcomment %}
-        background-size: cover;
-        background-position: center;
         font-family: 'Orbitron', sans-serif;
         color: #fff;
         height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        margin: 0;
+        overflow: hidden;
+        position: relative;
+        background: none; /* If you want a transparent background to see the video */
     }
 
     .join-container {
@@ -28,9 +23,11 @@
         border-radius: 15px;
         box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(0, 255, 255, 0.5);
         max-width: 400px;
-        width: 100%;
+        width: 90%;
         text-align: center;
         position: relative;
+        z-index: 1;
+        margin: auto;
     }
 
     .join-container::before {
@@ -85,6 +82,7 @@
     .join-form .form-group {
         width: 100%;
         margin-bottom: 20px;
+        position: relative;
     }
 
     .join-form input[type="text"] {
@@ -164,27 +162,13 @@
                 0 0 50px #00ffff;
         }
     }
-
-    /* Responsive Design */
-    @media (max-width: 480px) {
-        .join-container {
-            padding: 30px 20px;
-        }
-
-        .join-container h2 {
-            font-size: 28px;
-        }
-
-        .join-form button {
-            font-size: 16px;
-            padding: 10px 16px;
-        }
-    }
 </style>
+{% endblock %}
 
+{% block content %}
 <div class="join-container">
     <h2>Join the Game</h2>
-    {% comment %} <p>If you don't have an account, please <a href="{% url 'account_signup' %}">Sign Up</a> first.</p> {% endcomment %}
+    <p>If you don't have an account, please <a href="{% url 'account_signup' %}">Sign Up</a> first.</p>
 
     {% if error %}
         <ul class="errorlist">
