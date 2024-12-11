@@ -1,236 +1,218 @@
 <!-- website/templates/account/signup.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+{% extends 'index.html' %}
+{% load static %}
 
-    <title>Sign Up - Poker Addiction</title>
-    {% load static %}
+{% block title %}Sign Up - Poker Addiction{% endblock %}
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+{% block extra_head %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
-        /* Root styles */
-        body {
-            font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, #004f23 0%, #007f3f 100%);
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
+    /* Root styles */
+    body {
+        font-family: 'Orbitron', sans-serif;
+        background: #000000; /* Solid black background */
+        color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
 
-        /* Container for the signup form */
-        .signup-container {
-            position: relative;
-            max-width: 400px;
-            width: 90%;
-            background: rgba(0,0,0,0.8);
-            border-radius: 15px;
-            border: 3px solid #ffffff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.7);
-            padding: 40px;
-            text-align: center;
-        }
+    /* Container for the signup form */
+    .signup-container {
+        position: relative;
+        max-width: 400px;
+        width: 90%;
+        background: rgba(0, 0, 0, 0.85); /* Semi-transparent black */
+        border-radius: 15px;
+        border: 3px solid #ff0000; /* Neon red border */
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); /* Red neon shadows */
+        padding: 40px;
+        text-align: center;
+    }
 
-        /* Add a subtle suit-like pattern overlay */
-        .signup-container::before {
-            content: '';
-            position: absolute;
-            top: -10px; left: -10px; right: -10px; bottom: -10px;
-            border-radius: 20px;
-            background:
-                repeating-linear-gradient(
-                    45deg,
-                    transparent,
-                    transparent 15px,
-                    rgba(255,255,255,0.05) 15px,
-                    rgba(255,255,255,0.05) 30px
-                );
-            z-index: -2;
-            filter: blur(3px);
-        }
+    /* Glowing border effect */
+    .signup-container::after {
+        content: '';
+        position: absolute;
+        top: -5px; left: -5px; right: -5px; bottom: -5px;
+        border-radius: 15px;
+        background: linear-gradient(
+            90deg,
+            #ff0000, /* Neon red */
+            #ffffff, /* White */
+            #ff0000, /* Neon red */
+            #ffffff, /* White */
+            #ff0000  /* Neon red */
+        );
+        background-size: 400% 400%;
+        animation: borderGlow 8s ease-in-out infinite;
+        z-index: -1;
+        opacity: 0.8; /* Added opacity */
+        filter: blur(5px); /* Adjusted blur */
+    }
 
-        /* Glowing border effect */
-        .signup-container::after {
-            content: '';
-            position: absolute;
-            top: -5px; left: -5px; right: -5px; bottom: -5px;
-            border-radius: 15px;
-            background:
-                linear-gradient(
-                    90deg,
-                    #ff0000,
-                    #ffffff,
-                    #00ffff,
-                    #ffffff,
-                    #ff0000
-                );
-            background-size: 400% 400%;
-            animation: borderGlow 8s ease-in-out infinite;
-            z-index: -1;
-        }
+    /* Headline */
+    .signup-container h2 {
+        margin-bottom: 20px;
+        font-size: 32px;
+        color: #ff0000; /* Neon red color */
+        text-shadow:
+            0 0 4px #ffffff,
+            0 0 10px #ff0000;
+    }
 
-        /* Headline */
-        .signup-container h2 {
-            margin-bottom: 20px;
-            font-size: 32px;
-            color: #ff0000;
-            text-shadow:
-                0 0 2px #ffffff,
-                0 0 5px #ff0000;
-        }
+    /* Paragraph text */
+    .signup-container p {
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: #ffffff;
+        text-shadow: 0 0 4px #ff0000; /* Red glow */
+    }
 
-        /* Paragraph text */
-        .signup-container p {
-            margin-bottom: 20px;
-            font-size: 16px;
-            color: #ffffff;
-            text-shadow: 0 0 2px #ffffff;
-        }
+    /* Link Styling */
+    .signup-container a {
+        color: #ff0000; /* Neon red color */
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.3s ease;
+    }
 
-        .signup-container a {
-            color: #00ffff;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
+    .signup-container a:hover {
+        color: #ff4d4d; /* Lighter red on hover for subtle effect */
+    }
 
-        .signup-container a:hover {
-            color: #ff0000;
-        }
+    /* The form and its fields */
+    .signup-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-        /* The form and its fields */
-        .signup-form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    .signup-form .form-group {
+        width: 100%;
+        margin-bottom: 20px;
+        position: relative;
+    }
 
-        .signup-form .form-group {
-            width: 100%;
-            margin-bottom: 20px;
-        }
+    /* Input Fields Styling */
+    .signup-form input[type="text"],
+    .signup-form input[type="password"],
+    .signup-form input[type="email"] {
+        width: 100%;
+        padding: 12px 20px;
+        border: 2px solid #ff0000; /* Neon red border */
+        border-radius: 8px;
+        background: rgba(255, 0, 0, 0.2); /* Increased red transparency */
+        color: #fff;
+        font-size: 16px;
+        outline: none;
+        transition: border 0.3s, box-shadow 0.3s;
+        text-shadow: 0 0 2px #ff0000; /* Red glow */
+    }
 
-        .signup-form input[type="text"],
-        .signup-form input[type="password"],
-        .signup-form input[type="email"] {
-            width: 100%;
-            padding: 12px 20px;
-            border: 2px solid #00ffff;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: border 0.3s, box-shadow 0.3s;
-            text-shadow: 0 0 2px #00ffff;
-        }
+    .signup-form input::placeholder {
+        color: #ffffff;
+        opacity: 0.8;
+        text-shadow: none;
+    }
 
-        .signup-form input::placeholder {
-            color: #ffffff;
-            opacity: 0.8;
-            text-shadow: none;
-        }
+    .signup-form input:focus {
+        border: 2px solid #ff4d4d; /* Lighter red on focus */
+        box-shadow: 0 0 10px #ff4d4d;
+        background: rgba(255, 0, 0, 0.3);
+    }
 
-        .signup-form input:focus {
-            border: 2px solid #ff0000;
-            box-shadow: 0 0 10px #ff0000;
-        }
+    /* Submit button */
+    .signup-form button {
+        width: 100%;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #ff0000; /* Neon red background */
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow:
+            0 0 5px #ff0000,
+            0 0 10px #ff0000;
+        transition: background 0.3s, box-shadow 0.3s;
+    }
 
-        /* Submit button */
-        .signup-form button {
-            width: 100%;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            background: #ff0000;
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow:
-                0 0 5px #ff0000,
-                0 0 10px #ff0000;
-            transition: background 0.3s, box-shadow 0.3s;
-        }
+    .signup-form button:hover {
+        background: #cc0000; /* Darker red on hover */
+        box-shadow:
+            0 0 10px #ff0000,
+            0 0 20px #ff0000;
+    }
 
-        .signup-form button:hover {
-            background: #cc0000;
-            box-shadow:
-                0 0 10px #ff0000,
-                0 0 20px #ff0000;
-        }
+    /* Error messages */
+    .errorlist {
+        background: rgba(255, 0, 0, 0.8); /* Red background */
+        color: #fff;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        list-style: none;
+        text-align: left;
+        font-weight: bold;
+        text-shadow: none;
+    }
 
-        /* Error messages */
-        .errorlist {
-            background: rgba(255,0,0,0.8);
-            color: #fff;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            list-style: none;
-            text-align: left;
-            font-weight: bold;
-            text-shadow: none;
-        }
+    /* Keyframes */
+    @keyframes borderGlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
 
-        /* Keyframes */
-        @keyframes borderGlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    @media (max-width: 480px) {
+        .signup-container { padding: 30px 20px; }
+        .signup-container h2 { font-size: 28px; }
+        .signup-form button { font-size:16px; padding:10px 16px; }
+    }
+</style>
+{% endblock %}
 
-        @media (max-width: 480px) {
-            .signup-container { padding: 30px 20px; }
-            .signup-container h2 { font-size: 28px; }
-            .signup-form button { font-size:16px; padding:10px 16px; }
-        }
-    </style>
-</head>
-<body>
+{% block content %}
+    <div class="signup-container">
+        <h2>Create Your Account</h2>
+        <p>Already have an account? <a href="{% url 'account_login' %}">Log in</a> instead!</p>
 
-<div class="signup-container">
-    <h2>Create Your Account</h2>
-    <p>Already have an account? <a href="{% url 'account_login' %}">Log in</a> instead!</p>
-
-    {% if form.errors %}
-        <ul class="errorlist">
-            {% for field in form %}
-                {% for error in field.errors %}
+        {% if form.errors %}
+            <ul class="errorlist">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
                     <li>{{ error }}</li>
                 {% endfor %}
-            {% endfor %}
-            {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+            </ul>
+        {% endif %}
 
-    <form method="POST" class="signup-form" action="{% url 'account_signup' %}">
-        {% csrf_token %}
-        <div class="form-group">
-            {{ form.username }}
-        </div>
-        <div class="form-group">
-            {{ form.email }}
-        </div>
-        <div class="form-group">
-            {{ form.password1 }}
-        </div>
-        <div class="form-group">
-            {{ form.password2 }}
-        </div>
-        <div class="form-group">
-            <button type="submit">Sign Up</button>
-        </div>
-    </form>
-</div>
-
-</body>
-</html>
+        <form method="POST" class="signup-form" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.username }}
+            </div>
+            <div class="form-group">
+                {{ form.email }}
+            </div>
+            <div class="form-group">
+                {{ form.password1 }}
+            </div>
+            <div class="form-group">
+                {{ form.password2 }}
+            </div>
+            <div class="form-group">
+                <button type="submit">Sign Up</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

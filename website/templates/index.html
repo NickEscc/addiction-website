@@ -18,12 +18,12 @@
     <!-- Add any page-specific styles with an extra block if desired -->
     {% block extra_head %}{% endblock %}
 </head>
-<body style="background-color: white;">
+{% comment %} <body style="background-color: white;">
     <!-- Background Video -->
     <video autoplay muted loop class="background-video">
         <source src="{% static 'videos/poker_background.mp4' %}" type="video/mp4">
         Your browser does not support the video tag.
-    </video>
+    </video> {% endcomment %}
 
     <!-- Floating Poker Suits -->
     <div class="floating-suits">

@@ -1,12 +1,15 @@
 {% extends 'index.html' %}
 {% load static %}
+{% comment %} website/template/login.html {% endcomment %}
 
 {% block title %}Join Game - Poker Addiction{% endblock %}
 
 {% block extra_head %}
 <style>
+    /* Importing the Orbitron font for a futuristic look */
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
+    /* Basic Reset and Body Styling */
     body {
         font-family: 'Orbitron', sans-serif;
         color: #fff;
@@ -14,65 +17,92 @@
         margin: 0;
         overflow: hidden;
         position: relative;
-        background: none; /* If you want a transparent background to see the video */
+        background: none; /* Transparent to show the video */
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
+    /* Background Video Styling */
+    .background-video {
+        position: fixed; /* Fixed to ensure it covers the viewport */
+        top: 50%;
+        left: 50%;
+        width: auto;
+        height: 100%;
+        min-width: 100%;
+        min-height: 100%;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: -1; /* Ensures the video stays behind other elements */
+    }
+
+    /* Join Container Styling */
     .join-container {
-        background: rgba(0, 0, 0, 0.8);
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(0, 255, 255, 0.5);
-        max-width: 400px;
+        background: #000; /* Solid black background */
+        padding: 50px 40px;
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.6); /* Red neon shadows */
+        max-width: 450px;
         width: 90%;
         text-align: center;
-        position: relative;
-        z-index: 1;
-        margin: auto;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1; /* Above the video */
+        border: 2px solid #ff0000; /* Neon red border */
+        /* Removed position: relative; */
     }
 
+    /* Neon Glow Effect Around the Container */
     .join-container::before {
         content: '';
         position: absolute;
-        top: -10px;
-        left: -10px;
-        right: -10px;
-        bottom: -10px;
-        border-radius: 20px;
-        background: linear-gradient(45deg, #ff0000, #00ffff, #ff0000);
+        top: -15px;
+        left: -15px;
+        right: -15px;
+        bottom: -15px;
+        border-radius: 25px;
+        background: linear-gradient(45deg, #ff0000, #000000, #ff0000); /* Red to Black to Red */
         z-index: -1;
-        filter: blur(20px);
+        filter: blur(30px);
     }
 
+    /* Heading Styling with Neon Glow */
     .join-container h2 {
-        margin-bottom: 20px;
-        font-size: 32px;
-        color: #ff0000;
+        margin-bottom: 25px;
+        font-size: 36px;
+        color: #ff0000; /* Neon red color */
         text-shadow:
             0 0 5px #ff0000,
-            0 0 10px #ff0000,
-            0 0 20px #ff0000,
-            0 0 40px #00ffff;
-        animation: neonGlow 1.5s ease-in-out infinite alternate;
+            0 0 15px #ff0000,
+            0 0 25px #ff0000,
+            0 0 50px #ff0000; /* Red glow */
+        animation: neonGlow 2s ease-in-out infinite alternate;
     }
 
+    /* Paragraph Styling */
     .join-container p {
-        margin-bottom: 20px;
-        font-size: 16px;
+        margin-bottom: 25px;
+        font-size: 18px;
         color: #ffffff;
-        text-shadow: 0 0 5px #00ffff;
+        text-shadow: 0 0 10px #ff0000; /* Red glow */
     }
 
+    /* Link Styling */
     .join-container a {
-        color: #00ffff;
+        color: #ff0000; /* Neon red color */
         text-decoration: none;
         font-weight: bold;
         transition: color 0.3s ease;
     }
 
     .join-container a:hover {
-        color: #ff0000;
+        color: #ff4d4d; /* Lighter red on hover for subtle effect */
     }
 
+    /* Join Form Styling */
     .join-form {
         display: flex;
         flex-direction: column;
@@ -81,113 +111,142 @@
 
     .join-form .form-group {
         width: 100%;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         position: relative;
     }
 
+    /* Input Fields Styling */
     .join-form input[type="text"] {
         width: 100%;
-        padding: 12px 20px;
-        border: 2px solid #00ffff;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.1);
+        padding: 14px 24px;
+        border: 2px solid #ff0000; /* Neon red border */
+        border-radius: 10px;
+        background: rgba(255, 0, 0, 0.05); /* Slight red transparency */
         color: #fff;
-        font-size: 16px;
+        font-size: 18px;
         outline: none;
-        transition: border 0.3s ease;
-        text-shadow: 0 0 5px #00ffff;
+        transition: border 0.3s ease, background 0.3s ease;
+        text-shadow: 0 0 5px #ff0000;
     }
 
     .join-form input[type="text"]::placeholder {
         color: #ffffff;
-        opacity: 0.7;
+        opacity: 0.8;
         text-shadow: none;
     }
 
     .join-form input[type="text"]:focus {
-        border: 2px solid #ff0000;
+        border: 2px solid #ff4d4d; /* Lighter red on focus */
+        background: rgba(255, 0, 0, 0.1);
     }
 
+    /* Submit Button Styling */
     .join-form button {
         width: 100%;
-        padding: 12px 20px;
+        padding: 14px 24px;
         border: none;
-        border-radius: 8px;
-        background: #ff0000;
-        color: #fff;
-        font-size: 18px;
+        border-radius: 10px;
+        background: #ff0000; /* Neon red background */
+        color: #000; /* Black text for contrast */
+        font-size: 20px;
         font-weight: bold;
         cursor: pointer;
-        box-shadow:
-            0 0 5px #ff0000,
-            0 0 10px #ff0000,
-            0 0 20px #ff0000,
-            0 0 40px #ff0000;
-        transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .join-form button:hover {
-        background: #cc0000;
         box-shadow:
             0 0 10px #ff0000,
             0 0 20px #ff0000,
             0 0 30px #ff0000,
-            0 0 50px #ff0000;
+            0 0 60px #ff0000;
+        transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
     }
 
+    .join-form button:hover {
+        background: #ff4d4d; /* Lighter red on hover */
+        color: #fff; /* White text on hover for contrast */
+        box-shadow:
+            0 0 20px #ff4d4d,
+            0 0 30px #ff4d4d,
+            0 0 40px #ff4d4d,
+            0 0 80px #ff4d4d;
+    }
+
+    /* Error Message Styling */
     .errorlist {
-        background: rgba(255, 0, 0, 0.8);
+        background: rgba(255, 0, 0, 0.9);
         color: #fff;
-        padding: 10px;
-        margin-bottom: 15px;
-        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
         list-style: none;
         text-align: left;
         font-weight: bold;
+        font-size: 16px;
     }
 
+    /* Neon Glow Animation for Heading */
     @keyframes neonGlow {
         from {
-            text-shadow:
-                0 0 5px #ff0000,
-                0 0 10px #ff0000,
-                0 0 20px #ff0000,
-                0 0 40px #00ffff;
-        }
-        to {
             text-shadow:
                 0 0 10px #ff0000,
                 0 0 20px #ff0000,
                 0 0 30px #ff0000,
-                0 0 50px #00ffff;
+                0 0 60px #ff0000;
+        }
+        to {
+            text-shadow:
+                0 0 20px #ff0000,
+                0 0 30px #ff0000,
+                0 0 40px #ff0000,
+                0 0 80px #ff0000;
+        }
+    }
+
+    /* Responsive Adjustments for Smaller Screens */
+    @media (max-width: 480px) {
+        .join-container { 
+            padding: 40px 20px; 
+        }
+        .join-container h2 { 
+            font-size: 28px; 
+        }
+        .join-form input[type="text"],
+        .join-form button { 
+            font-size: 16px; 
+            padding: 12px 18px; 
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="join-container">
-    <h2>Join the Game</h2>
-    <p>If you don't have an account, please <a href="{% url 'account_signup' %}">Sign Up</a> first.</p>
+    <!-- Background Video -->
+    <video autoplay muted loop class="background-video">
+        <source src="{% static 'videos/poker_background.mp4' %}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
-    {% if error %}
-        <ul class="errorlist">
-            <li>{{ error }}</li>
-        </ul>
-    {% endif %}
+    <!-- Join Form Container -->
+    <div class="join-container">
+        <h2>Join the Game</h2>
+        <p>If you don't have an account, please <a href="{% url 'account_signup' %}">Sign Up</a> first.</p>
 
-    <form id="join-form" class="join-form" action="{% url 'join' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <input type="text" name="name" placeholder="Your Name" required>
-        </div>
-        <div class="form-group">
-            <input type="text" name="room_id" placeholder="Room ID (optional)">
-            <small style="color: #00ffff; font-size: 12px;">Leave this blank to join any available room</small>
-        </div>
-        <div class="form-group">
-            <button type="submit">Start Playing</button>
-        </div>
-    </form>
-</div>
+        {% if error %}
+            <ul class="errorlist">
+                <li>{{ error }}</li>
+            </ul>
+        {% endif %}
+
+        <form id="join-form" class="join-form" action="{% url 'join' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Your Name" required aria-label="Your Name">
+            </div>
+            <div class="form-group">
+                <input type="text" name="room_id" placeholder="Room ID (optional)" aria-label="Room ID">
+                <small style="color: #ff0000; font-size: 12px;">Leave this blank to join any available room</small>
+            </div>
+            <div class="form-group">
+                <button type="submit">Start Playing</button>
+            </div>
+        </form>
+    </div>
 {% endblock %}

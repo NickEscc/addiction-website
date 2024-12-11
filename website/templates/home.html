@@ -8,11 +8,17 @@
     <title>Poker Addiction - Home</title>
     <style>
         body {
+            min-height: 100vh;
             background-color: black;
-            color: black;
-            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            box-sizing: border-box;
+            color: white;
+            font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 0;
             text-align: center;
         }
 
@@ -39,34 +45,9 @@
             border-radius: 5px;
         }
 
-        nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #333;
-            padding: 10px 20px;
-            width: 100%;
-            margin-top: 80px;
-        }
-
-        .nav-btn {
-            background-color: #FF0000;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 18px;
-            margin: 0 10px;
-        }
-
-        .nav-btn:hover {
-            background-color: #cc0000;
-        }
-
         .intro {
             font-family: 'Neon Glow', sans-serif;
-            font-size: 200px;
+            font-size: 100px; 
             color: #FF0000;
             text-align: center;
             margin-top: 100px;
@@ -97,30 +78,188 @@
                     0 0 60px #FF3333;
             }
         }
+
+        .button-container {
+            display: flex;
+            gap: 50px;
+            margin-top: 50px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Initial: Red background & Black text */
+        .btn {
+            padding: 0.5em 1em;
+            background-color: #FF0000; /* Red background */
+            border: none;
+            user-select: none;
+            cursor: pointer;
+            font-size: 20px;
+            text-transform: uppercase;
+            transition: all 0.5s linear;
+            color: #000; /* Black text */
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 
+                        0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .btn:hover::after, .btn:hover::before {
+            content: '';
+            background: linear-gradient(90deg, #FC466B 0%, #3F5EFB 100%);
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            animation: move-right-side 1s ease infinite;
+        }
+
+        .btn:hover::before {
+            background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+            inset: 0;
+            animation: move-left-side 1s ease infinite;
+            z-index: -2;
+        }
+
+        /* On Hover: Black background & Red text */
+        .btn:hover {
+            background-color: #000; /* Black background on hover */
+            color: #FF0000;        /* Red font on hover */
+        }
+
+        @keyframes move-right-side {
+            0% {
+                inset: 0.3em 0 0 0.3em;
+            }
+            33% {
+                inset: 0 0.3em 0.3em 0;
+            }  
+            66% {
+                inset: 1em 0 0 0.5em;
+            }
+            100% {
+                inset: 0 1em 0.5em 0;
+            }
+        }
+
+        @keyframes move-left-side {
+            0% {
+                right: -1em;
+                top: -0.5em;
+            }
+            33% {
+                bottom: -1em;
+                left: -0.5em;
+            }
+            66% {
+                top: 0;
+                right: -0.7em;
+            }
+            100% {
+                right: -1em;
+                top: -0.5em;
+            }
+        }
+
+        /* New Container for Video Buttons */
+        .video-button-container {
+            display: flex;
+            width: 100%;
+            height: 50vh; /* Adjust as needed */
+            margin-top: 50px;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Individual Video Button */
+        .video-btn {
+            position: relative;
+            width: 45vw; /* Half of viewport width minus gap */
+            height: 45vw; /* Square */
+            overflow: hidden;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 
+                        0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .video-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Video Styling */
+        .video-btn video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Overlay Text */
+        .video-btn .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FF0000;
+            font-size: 2em;
+            font-weight: bold;
+            text-shadow:
+                0 0 10px #FF0000,
+                0 0 20px #FF0000,
+                0 0 30px #FF0000;
+            pointer-events: none;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .video-button-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .video-btn {
+                width: 80vw;
+                height: 80vw;
+            }
+        }
     </style>
 </head>
 <body>
-
     <div class="top-left-title">Poker Addiction</div>
     <div class="top-left-subtitle">The Ultimate Poker Experience</div>
-
-    <nav>
-        <div>
-            {% if user.is_authenticated %}
-                <!-- If user is authenticated, show Play Game which goes to 'join' -->
-                <a href="{% url 'join' %}" class="nav-btn">Play Game</a>
-                <a href="{% url 'account_logout' %}" class="nav-btn">Logout</a>
-            {% else %}
-                <!-- If user is not authenticated, show login and signup only -->
-                <a href="{% url 'account_login' %}" class="nav-btn">Login</a>
-                <a href="{% url 'account_signup' %}" class="nav-btn">Sign Up</a>
-            {% endif %}
-        </div>
-    </nav>
 
     <div class="intro">
         Poker Game
     </div>
 
+    <div class="button-container">
+        {% if user.is_authenticated %}
+            <a href="{% url 'join' %}" class="btn">Play Game</a>
+            <a href="{% url 'account_logout' %}" class="btn">Logout</a>
+        {% else %}
+            <a href="{% url 'account_login' %}" class="btn">Login</a>
+            <a href="{% url 'account_signup' %}" class="btn">Sign Up</a>
+        {% endif %}
+    </div>
+
+    <!-- New Video Button Section -->
+    <div class="video-button-container">
+        {% comment %} <a href="{% url 'how_to_play' %}" class="video-btn"> {% endcomment %}
+            <video src="{% static 'videos/how_to_play.mp4' %}" autoplay loop muted></video>
+            <div class="overlay-text">How to Play</div>
+        </a>
+        {% comment %} <a href="{% url 'how_it_works' %}" class="video-btn"> {% endcomment %}
+            <video src="{% static 'videos/how_it_works.mp4' %}" autoplay loop muted></video>
+            <div class="overlay-text">How it Works</div>
+        </a>
+    </div>
 </body>
 </html>
