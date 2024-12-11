@@ -375,9 +375,9 @@ var PyPoker = {
 
             if (min_bet === 0) {
         // Player can check (no bet needed)
-                $('#bet-input-wrapper').hide();
-                $('#bet-cmd-wrapper').hide();
-                $('#no-bet-cmd-wrapper').show();  // Show "No Bet" (Check) button
+        $('#bet-input-wrapper').show();   // Show the slider for selecting a bet amount
+        $('#bet-cmd-wrapper').show();     // Show the Bet button
+        $('#no-bet-cmd-wrapper').show();  // Show "No Bet" (Check) button
                 $('#bet-cmd').text("Check");      // Label bet-cmd as "Check"
             } else {
         // Player must place a bet if they want to stay in the game
