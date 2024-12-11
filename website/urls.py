@@ -9,4 +9,6 @@ urlpatterns = [
     
     path('join/', views.join, name='join'),  # New route for pre-game setup page
     path('game/', views.game, name='game'),
+     path('howtoplay/', views.howtoplay, name='howtoplay'),
+    path('howitworks/', views.howitworks, name='howitworks'),
 ]

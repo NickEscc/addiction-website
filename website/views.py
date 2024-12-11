@@ -8,7 +8,11 @@ def home(request):
 
 def index(request):
     return render(request, "index.html")
+def howtoplay(request):
+    return render(request, "website/howtoplay.html")
 
+def howitworks(request):
+    return render(request, "website/howitworks.html")
 @login_required(login_url='account_login')
 def join(request):
     # This view shows the pre-game form and then sets up the session for the game.
