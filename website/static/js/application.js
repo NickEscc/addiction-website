@@ -219,7 +219,7 @@ var PyPoker = {
 
         addSharedCards: function(cards) {
             let $sharedCardsContainer = $('#shared-cards');
-            $sharedCardsContainer.empty(); // Clear existing shared cards
+            // $sharedCardsContainer.empty(); // Clear existing shared cards
 
             cards.forEach(function(card) {
                 let $card = $('<div class="card medium"></div>');
