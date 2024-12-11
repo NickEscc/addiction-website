@@ -140,7 +140,6 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
             "room_id": self.room_id
         })
 
-        await self.send_room_update()
 
     async def handle_start_game(self):
         # Mark player as ready for the game to start
@@ -202,11 +201,8 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def room_update(self, event):
-        await self.send_json(
-            {"message_type": "room-update",
-             "players": event["players"],
-             "can_start": event["can_start"]
-             })
+        await self.send_json(event)
+
 
     async def player_left(self, event):
         await self.send_json({
