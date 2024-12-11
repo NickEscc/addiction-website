@@ -337,7 +337,7 @@ body {
 }
 
 #table #pots .pot {
-    background-image: url('/static/images/cards-50.png');
+    background-image: url('/static/images/chips-small.png'); /* Example replacement */
     background-repeat: no-repeat;
     padding: 15px 0px 10px 40px;
     height: 45px;
