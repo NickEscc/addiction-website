@@ -63,16 +63,15 @@ class PlayerServer(Player):
         if prompt_message:
             await self.send_message(prompt_message)
         try:
-            # This will wait for a JSON message from the channel until the timeout
             if timeout_epoch is not None:
                 timeout = max(0, timeout_epoch - asyncio.get_event_loop().time())
-                message = await asyncio.wait_for(self._channel.get_next_message(), timeout=timeout)
+                msg = await asyncio.wait_for(self._bet_queue.get(), timeout=timeout)
             else:
-                message = await self._channel.get_next_message()
+                msg = await self._bet_queue.get()
 
-            self._logger.debug(f"Message received from player {self.id}: {message}")
+            self._logger.debug(f"Message received from player {self.id}: {msg}")
             self.last_active = asyncio.get_event_loop().time()
-            return message
+            return msg
         except asyncio.TimeoutError:
             self._logger.error(f"Receiving message timed out for player {self.id}")
             raise MessageTimeout("Receiving message timed out.")
@@ -89,6 +88,13 @@ class PlayerServer(Player):
         pass
 
     async def receive_bet(self, message):
-        # Implement bet handling
-        pass
-
+        bet_value = message.get("bet")
+        if bet_value is not None:
+        # Put the bet value into the queue so that recv_message can retrieve it
+            await self._bet_queue.put({
+            "message_type": "bet",
+            "bet": bet_value
+        })
+            self._logger.debug(f"Player {self.id} bet queued: {bet_value}")
+        else:
+            self._logger.warning(f"No bet found in the message for player {self.id}: {message}")
