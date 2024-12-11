@@ -90,7 +90,7 @@ ACCOUNT_FORMS = {
     'signup': 'website.forms.CustomSignUpForm',
 }
 
-LOGIN_REDIRECT_URL = 'game'
+LOGIN_REDIRECT_URL = 'home'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'home'
 
 ROOT_URLCONF = 'addiction.urls'
