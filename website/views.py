@@ -6,6 +6,22 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from .forms import CustomSignUpForm
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+import os
+import uuid
+import redis
+import logging
+from django.http import JsonResponse
+from django.urls import reverse
+
+
+# Logging configuration
+logger = logging.getLogger(__name__)
+
+# Redis configuration (if used)
+redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+redis_client = redis.from_url(redis_url)
 
 def custom_signup(request):
     if request.method == 'POST':

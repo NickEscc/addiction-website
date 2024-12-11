@@ -243,49 +243,59 @@ var PyPoker = {
         },
 
         onGameUpdate: function(message) {
-            PyPoker.Player.resetControls();
             PyPoker.Player.resetTimers();
 
             switch (message.event) {
                 case 'new-game':
+                    PyPoker.Player.resetControls();
                     PyPoker.Game.newGame(message);
                     break;
                 case 'cards-assignment':
+                    // PyPoker.Player.resetControls();
                     PyPoker.Game.updateCurrentPlayerCards(message.cards, message.score);
                     break;
                 case 'game-over':
+                    // PyPoker.Player.resetControls();
                     PyPoker.Game.gameOver();
                     break;
                 case 'fold':
+                    // PyPoker.Player.resetControls();
                     PyPoker.Game.playerFold(message.player);
                     break;
                 case 'bet':
+                    // PyPoker.Player.resetControls();
                     PyPoker.Game.updatePlayer(message.player);
                     PyPoker.Game.updatePlayersBet(message.bets);
                     break;
                 case 'pots-update':
+                    // PyPoker.Player.resetControls();
                     PyPoker.Game.updatePlayers(message.players);
                     PyPoker.Game.updatePots(message.pots);
                     PyPoker.Game.updatePlayersBet();
                     break;
                 case 'player-action':
+                    // PyPoker.Player.resetControls();
                     PyPoker.Player.onPlayerAction(message);
                     break;
                 case 'dead-player':
+                    // PyPoker.Player.resetControls();
                     PyPoker.Game.playerFold(message.player);
                     break;
                 case 'cards-change':
+                    // PyPoker.Player.resetControls();
                     PyPoker.Game.changeCards(message.player, message.num_cards);
                     break;
                 case 'shared-cards':
                     PyPoker.Game.addSharedCards(message.cards);
                     break;
                 case 'winner-designation':
+                    PyPoker.Player.resetControls();
                     PyPoker.Game.updatePlayers(message.players);
                     PyPoker.Game.updatePots(message.pots);
                     PyPoker.Game.setWinners(message.pot);
                     break;
                 case 'showdown':
+                    PyPoker.Player.resetControls();
                     PyPoker.Game.updatePlayersCards(message.players);
                     break;
                 case 'ping':
@@ -344,7 +354,7 @@ var PyPoker = {
         enableBetMode: function(message) {
             PyPoker.Player.betMode = true;
 
-            if (!message.min_score || $('#current-player').data('allowed-to-bet')) {
+            if (!message.min_score || $('#current-player').data('allowed-to-bet',true)) {
                 $('#bet-input').slider({
                     'min': parseInt(message.min_bet),
                     'max': parseInt(message.max_bet),
@@ -490,13 +500,13 @@ var PyPoker = {
         },
 
         onPlayerRemoved: function(message) {
-            var playerId = message.player_id;
+            var playerId = message.id;
             $('#players .player[data-player-id="' + playerId + '"]').remove();
-            PyPoker.Logger.log("Player removed: " + message.player_id);
+            PyPoker.Logger.log("Player removed: " + message.id);
         },
 
         onPlayerAdded: function(message) {
-            PyPoker.Logger.log("Player added: " + message.player_name);
+            PyPoker.Logger.log("Player added: " + message.name);
         },
 
         initRoom: function(players) {
@@ -507,12 +517,12 @@ var PyPoker = {
                 $seat.attr('data-key', index);
 
                 var $playerElement = PyPoker.Room.createPlayer({
-                    id: player.player_id,
-                    name: player.player_name,
-                    money: player.player_money
+                    id: player.id,
+                    name: player.name,
+                    money: player.money
                 });
                 $seat.append($playerElement);
-                $seat.attr('data-player-id', player.player_id);
+                $seat.attr('data-player-id', player.id);
 
                 $('#players').append($seat);
             });
@@ -646,8 +656,8 @@ var PyPoker = {
                     console.warn("Unknown message type:", data.message_type);
             }
 
-            PyPoker.Player.setCardsChangeMode(false);
-            PyPoker.Player.disableBetMode();
+            // PyPoker.Player.setCardsChangeMode(false);
+            // PyPoker.Player.disableBetMode();
         };
 
         // Handle "Start Game" button click
@@ -668,7 +678,9 @@ var PyPoker = {
             });
             PyPoker.socket.send(JSON.stringify({
                 'message_type': 'cards-change',
-                'cards': discards
+                'cards': discards,
+                "player_id": PyPoker.Game.getCurrentPlayerId()                ,
+                "player_money":  PyPoker.Game.getCurrentPlayerMoney()
             }));
             PyPoker.Player.setCardsChangeMode(false);
         });
@@ -676,7 +688,10 @@ var PyPoker = {
         $('#fold-cmd').click(function() {
             PyPoker.socket.send(JSON.stringify({
                 'message_type': 'bet',
-                'bet': -1
+                'bet': -1,
+                "player_id": PyPoker.Game.getCurrentPlayerId()
+                ,
+                "player_money":  PyPoker.Game.getCurrentPlayerMoney()
             }));
             PyPoker.Player.disableBetMode();
         });
@@ -684,7 +699,9 @@ var PyPoker = {
         $('#no-bet-cmd').click(function() {
             PyPoker.socket.send(JSON.stringify({
                 'message_type': 'bet',
-                'bet': 0
+                'bet': 0,
+                "player_id": PyPoker.Game.getCurrentPlayerId()                ,
+                "player_money":  PyPoker.Game.getCurrentPlayerMoney()
             }));
             PyPoker.Player.disableBetMode();
         });
@@ -692,7 +709,9 @@ var PyPoker = {
         $('#bet-cmd').click(function() {
             PyPoker.socket.send(JSON.stringify({
                 'message_type': 'bet',
-                'bet': $('#bet-input').val()
+                'bet': $('#bet-input').val(),
+                "player_id": PyPoker.Game.getCurrentPlayerId() ,
+                "player_money":  PyPoker.Game.getCurrentPlayerMoney()
             }));
             PyPoker.Player.disableBetMode();
         });

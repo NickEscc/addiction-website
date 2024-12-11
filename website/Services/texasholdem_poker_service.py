@@ -10,7 +10,6 @@ from .Logic.PokerGame import HoldemPokerGameFactory
 from .Logic.Game_RoomServer import GameRoomFactory, GameServer
 from .Logic.Game_server_instance import set_game_server_instance
 from typing import Optional
-# python3 -m website.Services.texasholdem_poker_service
 
 # Configure the logger
 logger = logging.getLogger("TexasHoldemServer")
@@ -39,7 +38,7 @@ def initialize_game_server() -> Optional[GameServer]:
         logger.exception(f"Failed to initialize game server: {e}")
         return None
 
-async def start_daphne_server(application, host: str = "127.0.0.1", port: int = 8001):
+async def start_daphne_server(application, host: str = "127.0.0.1", port: int = 8000):
     """
     Starts the Daphne ASGI server.
     """
@@ -79,7 +78,7 @@ async def main():
         sys.exit(1)
 
     # Start Daphne server
-    await start_daphne_server(application, host="127.0.0.1", port=8001)
+    await start_daphne_server(application, host="127.0.0.1", port=8002)
 
 def shutdown(signal_num, frame):
     """

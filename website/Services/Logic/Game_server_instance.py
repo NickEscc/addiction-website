@@ -15,3 +15,4 @@ def set_game_server_instance(instance: GameServer) -> None:
 
 def get_game_server_instance() -> Optional[GameServer]:
     return _game_server_instance
+

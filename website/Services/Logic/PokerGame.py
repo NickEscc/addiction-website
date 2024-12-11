@@ -141,8 +141,27 @@ class Player:
 
 
 class MessageFormatError(Exception):
-    pass
+    def __init__(self, attribute=None, desc=None, expected=None, found=None):
+        message = "Invalid message received."
+        if attribute:
+            message += " Invalid message attribute {}.".format(attribute)
+            if expected is not None and found is not None:
+                message += " '{}' expected, found '{}'.".format(expected, found)
+        if desc:
+            message += " " + desc
+        Exception.__init__(self, message)
 
+    @staticmethod
+    def validate_message_type(message, expected):
+        if "message_type" not in message:
+            raise MessageFormatError(attribute="message_type", desc="Attribute is missing")
+        elif message["message_type"] == "error":
+            if "error" in message:
+                raise MessageFormatError(desc="Error received from the remote host: '{}'".format(message['error']))
+            else:
+                raise MessageFormatError(desc="Unknown error received from the remote host")
+        if message["message_type"] != expected:
+            raise MessageFormatError(attribute="message_type", expected=expected, found=message["message_type"])
 
 class Cards:
     def __init__(self, cards: List[Card], lowest_rank=2):
@@ -578,6 +597,7 @@ class GameEventDispatcher:
         self._subscribers.remove(subscriber)
 
     async def raise_event(self, event, event_data):
+        event_data["message_type"] = "game-update"
         event_data["event"] = event
         event_data["game_id"] = self._game_id
         self._logger.debug(f"GAME: {self._game_id} EVENT: {event}\n{event_data}")
@@ -637,6 +657,7 @@ class GameEventDispatcher:
                 "player": player.dto(),
                 "min_bet": min_bet,
                 "max_bet": max_bet,
+                "allowed_to_bet": True,  
                 "bets": bets,
                 "timeout": timeout,
                 "timeout_date": time.strftime("%Y-%m-%d %H:%M:%S+0000", time.gmtime(timeout_epoch))
@@ -728,6 +749,47 @@ class GameBetRounder:
     def _get_min_bet(self, dealer: Player, bets: Dict[str, float]) -> float:
         return min(max(bets.values()) - bets[dealer.id], dealer.money)
 
+    # async def bet_round(self, dealer_id: str, bets: Dict[str, float], get_bet_function, on_bet_function=None) -> Optional[Player]:
+    #     players_round = list(self._game_players.round(dealer_id))
+    #     if len(players_round) == 0:
+    #         raise GameError("No active players in this game")
+    #
+    #     dealer = players_round[0]
+    #     for k, player in enumerate(players_round):
+    #         if player.id not in bets:
+    #             bets[player.id] = 0
+    #         if bets[player.id] < 0 or (k > 0 and bets[player.id] < bets[players_round[k - 1].id]):
+    #             raise ValueError("Invalid bets dictionary")
+    #
+    #     best_player = None
+    #     while dealer is not None and dealer != best_player:
+    #         next_player = self._game_players.get_next(dealer.id)
+    #         max_bet = self._get_max_bet(dealer, bets)
+    #         min_bet = self._get_min_bet(dealer, bets)
+    #
+    #         if max_bet == 0.0:
+    #             bet = 0.0
+    #         else:
+    #             bet = await get_bet_function(player=dealer, min_bet=min_bet, max_bet=max_bet, bets=bets)
+    #
+    #         if bet is None:
+    #             self._game_players.remove(dealer.id)
+    #         elif bet == -1:
+    #             self._game_players.fold(dealer.id)
+    #         else:
+    #             if bet < min_bet or bet > max_bet:
+    #                 raise ValueError("Invalid bet")
+    #             dealer.take_money(bet)
+    #             bets[dealer.id] += bet
+    #             if best_player is None or bet > min_bet:
+    #                 best_player = dealer
+    #
+    #         if on_bet_function:
+    #             await on_bet_function(dealer, bet, min_bet, max_bet, bets)
+    #
+    #         dealer = next_player
+    #     return best_player
+
     async def bet_round(self, dealer_id: str, bets: Dict[str, float], get_bet_function, on_bet_function=None) -> Optional[Player]:
         players_round = list(self._game_players.round(dealer_id))
         if len(players_round) == 0:
@@ -740,34 +802,30 @@ class GameBetRounder:
             if bets[player.id] < 0 or (k > 0 and bets[player.id] < bets[players_round[k - 1].id]):
                 raise ValueError("Invalid bets dictionary")
 
-        best_player = None
-        while dealer is not None and dealer != best_player:
-            next_player = self._game_players.get_next(dealer.id)
-            max_bet = self._get_max_bet(dealer, bets)
-            min_bet = self._get_min_bet(dealer, bets)
+        for player_id, bet_amount in bets.items():
+            player = self._game_players._players[player_id]
+            if not player:
+                continue
+            max_bet = self._get_max_bet(player, bets)
+            min_bet = self._get_min_bet(player, bets)
 
             if max_bet == 0.0:
                 bet = 0.0
             else:
-                bet = await get_bet_function(player=dealer, min_bet=min_bet, max_bet=max_bet, bets=bets)
+                bet = await get_bet_function(player=player, min_bet=min_bet, max_bet=max_bet, bets=bets)
 
             if bet is None:
-                self._game_players.remove(dealer.id)
+                self._game_players.remove(player.id)
             elif bet == -1:
-                self._game_players.fold(dealer.id)
+                self._game_players.fold(player.id)
             else:
                 if bet < min_bet or bet > max_bet:
                     raise ValueError("Invalid bet")
-                dealer.take_money(bet)
-                bets[dealer.id] += bet
-                if best_player is None or bet > min_bet:
-                    best_player = dealer
-
+                player.take_money(bet)
+                # bets[player.id] += bet
             if on_bet_function:
-                await on_bet_function(dealer, bet, min_bet, max_bet, bets)
-
-            dealer = next_player
-        return best_player
+                await on_bet_function(player, bet, min_bet, max_bet, bets)
+        return
 
 
 class GameBetHandler:
@@ -788,6 +846,7 @@ class GameBetHandler:
         if self.any_bet(bets):
             pots.add_bets(bets)
             await self._event_dispatcher.pots_update_event(self._game_players.active, pots)
+
         return best_player
 
     async def get_bet(self, player, min_bet: float, max_bet: float, bets: Dict[str, float]) -> Optional[int]:
@@ -800,11 +859,15 @@ class GameBetHandler:
             timeout=self._bet_timeout,
             timeout_epoch=timeout_epoch
         )
-        return await self.receive_bet(player, min_bet, max_bet, timeout_epoch)
+        return await self.receive_bet(player, min_bet, max_bet, bets, timeout_epoch)
 
-    async def receive_bet(self, player, min_bet, max_bet, timeout_epoch) -> Optional[int]:
+    async def receive_bet(self, player, min_bet, max_bet, bets, timeout_epoch) -> Optional[int]:
         try:
-            message = await player.recv_message(timeout_epoch=timeout_epoch)
+            message = {
+                "message_type": "bet",
+                "bet": bets[player.id],
+            }
+            # message = await player.recv_message(temp_message, timeout_epoch=timeout_epoch)
             MessageFormatError.validate_message_type(message, "bet")
 
             if "bet" not in message:
@@ -971,6 +1034,10 @@ class HoldemPokerGame(PokerGame):
         super().__init__(*args, **kwargs)
         self._big_blind = big_blind
         self._small_blind = small_blind
+        self.scores = None
+        self.pots = None
+        self.deck = None
+        self.current_stage = "pre-flop"
         self._logger = logger or logging.getLogger(__name__)
 
     async def _add_shared_cards(self, new_shared_cards, scores):
@@ -1011,6 +1078,123 @@ class HoldemPokerGame(PokerGame):
         )
 
         return bets
+
+    async def play_hand_preflop(self, dealer_id):
+        self._logger.info(f"Starting hand in game {self._id} with dealer {dealer_id}")
+
+        self._game_players.reset()
+        self.deck = self._deck_factory.create_deck()
+        self.scores = self._create_scores()
+        self.pots = self._create_pots()
+
+        await self._event_dispatcher.new_game_event(
+            game_id=self._id,
+            players=self._game_players.active,
+            dealer_id=dealer_id,
+            big_blind=self._big_blind,
+            small_blind=self._small_blind,
+        )
+        self._logger.info("New game event sent.")
+
+        try:
+            # Collect blinds
+            blind_bets = await self._collect_blinds(dealer_id)
+            self._logger.info(f"Blinds collected: {blind_bets}")
+            bets = blind_bets
+
+            # Pre-flop
+            await self._assign_cards(2, dealer_id, self.deck, self.scores)
+            self._logger.info("Pre-flop cards assigned.")
+
+            await self._bet_handler.bet_round(dealer_id, bets, self.pots)
+            self._logger.info("Pre-flop betting round completed.")
+
+            await self._add_shared_cards(self.deck.pop_cards(3), self.scores)
+            self._logger.info("Flop cards added.")
+            self.current_stage = "flop"
+
+        except EndGameException:
+            self._logger.info("Game ended due to insufficient players.")
+        except Exception as e:
+            self._logger.exception(f"Error during play_hand: {e}")
+        finally:
+            self._logger.info(f"Game {self._id} pre-flop betting round completed.")
+
+    async def handle_bet_event(self, player_id, bets):
+        player = self._game_players._players[player_id]
+
+        if not player:
+            raise Exception
+
+        min_bet = self._bet_handler._bet_rounder._get_min_bet(player, bets)
+        max_bet = self._bet_handler._bet_rounder._get_max_bet(player, bets)
+
+        timeout_epoch = time.time() + self._bet_handler._bet_timeout
+        await self._event_dispatcher.bet_action_event(
+            player=player,
+            min_bet=min_bet,
+            max_bet=max_bet,
+            bets=bets,
+            timeout=self._bet_handler._bet_timeout,
+            timeout_epoch=timeout_epoch
+        )
+
+    async def play_hand_flop(self, dealer_id, bets):
+        self._logger.info(f"Starting flop in game {self._id} with dealer {dealer_id}")
+        try:
+            await self._bet_handler.bet_round(dealer_id, bets, self.pots)
+            self._logger.info("Flop betting round completed.")
+            await self._add_shared_cards(self.deck.pop_cards(1), self.scores)
+            self._logger.info("Turn card added.")
+            self.current_stage = "turn"
+        except EndGameException:
+            self._logger.info("Game ended due to insufficient players.")
+        except Exception as e:
+            self._logger.exception(f"Error during play_hand: {e}")
+        finally:
+            self._logger.info(f"Game {self._id} flop betting round completed.")
+
+
+    async def play_hand_turn(self, dealer_id, bets):
+        self._logger.info(f"Starting turn in game {self._id} with dealer {dealer_id}")
+        try:
+            await self._bet_handler.bet_round(dealer_id, bets, self.pots)
+            self._logger.info("Turn betting round completed.")
+            await self._add_shared_cards(self.deck.pop_cards(1), self.scores)
+            self._logger.info("River card added.")
+            self.current_stage = "river"
+        except EndGameException:
+            self._logger.info("Game ended due to insufficient players.")
+        except Exception as e:
+            self._logger.exception(f"Error during play_hand: {e}")
+        finally:
+            self._logger.info(f"Game {self._id} turn betting round completed.")
+
+
+    async def play_hand_river(self, dealer_id, bets):
+            self._logger.info(f"Starting flop in game {self._id} with dealer {dealer_id}")
+            try:
+                await self._bet_handler.bet_round(dealer_id, bets, self.pots)
+                self._logger.info("River betting round completed.")
+                self.current_stage = "pre-flop"
+
+                # Showdown
+                if self._game_players.count_active() > 1:
+                    await self._showdown(self.scores)
+                    self._logger.info("Showdown completed.")
+
+                await self._detect_winners(self.pots, self.scores)
+                self._logger.info("Winners detected.")
+
+            except EndGameException:
+                self._logger.info("Game ended due to insufficient players.")
+                await self._detect_winners(self.pots, self.scores)
+            except Exception as e:
+                self._logger.exception(f"Error during play_hand: {e}")
+            finally:
+                await self._event_dispatcher.game_over_event()
+                self._logger.info(f"Game {self._id} hand completed.")
+
 
     async def play_hand(self, dealer_id):
         self._logger.info(f"Starting hand in game {self._id} with dealer {dealer_id}")
@@ -1062,7 +1246,6 @@ class HoldemPokerGame(PokerGame):
             self._logger.info("River card added.")
             await self._bet_handler.bet_round(dealer_id, {}, pots)
             self._logger.info("River betting round completed.")
-
 
             # Showdown
             if self._game_players.count_active() > 1:

@@ -136,6 +136,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 WHITENOISE_MAX_AGE = 0
 USE_TZ = True
+LOGIN_REDIRECT_URL = 'game' 
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
@@ -160,13 +161,22 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Logging configuration
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
     'formatters': {
-        'simple': {'format': '%(levelname)s %(message)s'},
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
     },
     'handlers': {
         'console': {
@@ -176,8 +186,19 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
-        'django.db.backends': {'handlers': ['console'], 'level': 'ERROR'},
-        'website': {'handlers': ['console'], 'level': 'INFO'},
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {  # This is key to suppressing SQL logs
+            'handlers': ['console'],
+            'level': 'ERROR',  # This will essentially disable SQL query logging
+        },
+        'website': {  # Your app logger
+            'handlers': ['console',],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
     },
 }

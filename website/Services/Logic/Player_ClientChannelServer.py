@@ -58,15 +58,15 @@ class PlayerServer(Player):
             self._logger.error(f"Failed to send message to player {self.id}: {e}")
             self._connected = False
 
-    async def recv_message(self, timeout_epoch: Optional[float] = None) -> Any:
+    async def recv_message(self, message, timeout_epoch: Optional[float] = None) -> Any:
         if not self._connected or self._channel is None:
             raise ChannelError("Not connected")
         try:
             if timeout_epoch is not None:
                 timeout = max(0, timeout_epoch - asyncio.get_event_loop().time())
-                message = await asyncio.wait_for(self._channel.receive_json(), timeout=timeout)
+                message = await asyncio.wait_for(self._channel.receive_json(message), timeout=timeout)
             else:
-                message = await self._channel.receive_json()
+                message = await self._channel.receive_json(message)
             self._logger.debug(f"Message received from player {self.id}: {message}")
             # Update last_active time whenever a message is received
             self.last_active = asyncio.get_event_loop().time()
@@ -81,3 +81,12 @@ class PlayerServer(Player):
                 await self.send_message({"message_type": "disconnect"})
             self._connected = False
             self._logger.info(f"Player {self.id} disconnected.")
+
+    async def handle_pong(self):
+        # Implement pong handling
+        pass
+
+    async def receive_bet(self, message):
+        # Implement bet handling
+        pass
+

@@ -43,12 +43,12 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
                 self.room_group_name,
                 {
                     "type": "player_left",
-                    "player_id": self.player_id,
-                    "player_name": self.player_name,
+                    "id": self.player_id,
+                    "name": self.player_name,
                 }
             )
 
-    async def receive_json(self, content):
+    async def receive_json(self, content, **kwargs):
         message_type = content.get("message_type")
         logger.debug(f"Received message: {content}")
 
@@ -62,6 +62,8 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
             await self.handle_start_game()
         else:
             logger.warning(f"Unhandled message type: {message_type}")
+
+        return content
 
     @database_sync_to_async
     def get_session_value(self, key, default=None):
@@ -115,9 +117,9 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
 
         await self.send_json({
             "message_type": "join-success",
-            "player_id": self.player_id,
-            "player_name": self.player_name,
-            "player_money": self.player_money,
+            "id": self.player_id,
+            "name": self.player_name,
+            "money": self.player_money,
             "room_id": self.room_id
         })
 
@@ -138,14 +140,28 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
         else:
             logger.warning(f"Room {self.room_id} not found while handling start-game.")
 
+    async def handle_bet(self, content):
+        # Mark player as ready for the game to start
+        game_server_instance = get_game_server_instance()
+        if game_server_instance is None:
+            return
+
+        print("Game server rooms", game_server_instance._rooms)
+
+        room = next((r for r in game_server_instance._rooms if r.id == self.room_id), None)
+        if room:
+            await room.poll_bets(content)
+        else:
+            logger.warning(f"Room {self.room_id} not found while handling start-game.")
+
     async def add_player_to_room(self):
         if self.room_id not in self.rooms:
             self.rooms[self.room_id] = {}
 
         self.rooms[self.room_id][self.player_id] = {
-            "player_id": self.player_id,
-            "player_name": self.player_name,
-            "player_money": self.player_money
+            "id": self.player_id,
+            "name": self.player_name,
+            "money": self.player_money
         }
         logger.debug(f"Player {self.player_id} added to room {self.room_id}")
 
@@ -179,8 +195,8 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
     async def player_left(self, event):
         await self.send_json({
             "message_type": "player-removed",
-            "player_id": event["player_id"],
-            "player_name": event["player_name"]
+            "id": event["id"],
+            "name": event["name"]
         })
 
     async def player_joined(self, event):
