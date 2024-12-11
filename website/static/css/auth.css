@@ -1,0 +1,171 @@
+/* static/css/auth.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+/* Root styles */
+body {
+    font-family: 'Orbitron', sans-serif;
+    background: #000000; /* Solid black background */
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container for authentication forms */
+.auth-container {
+    position: relative;
+    max-width: 400px;
+    width: 90%;
+    background: rgba(0, 0, 0, 0.85); /* Semi-transparent black */
+    border-radius: 15px;
+    border: 3px solid #ff0000; /* Neon red border */
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); /* Red neon shadows */
+    padding: 40px;
+    text-align: center;
+}
+
+/* Glowing border effect */
+.auth-container::after {
+    content: '';
+    position: absolute;
+    top: -5px; left: -5px; right: -5px; bottom: -5px;
+    border-radius: 15px;
+    background: linear-gradient(
+        90deg,
+        #ff0000, /* Neon red */
+        #ffffff, /* White */
+        #ff0000, /* Neon red */
+        #ffffff, /* White */
+        #ff0000  /* Neon red */
+    );
+    background-size: 400% 400%;
+    animation: borderGlow 8s ease-in-out infinite;
+    z-index: -1;
+    opacity: 0.8; /* Added opacity */
+    filter: blur(5px); /* Adjusted blur */
+}
+
+/* Headline */
+.auth-container h2 {
+    margin-bottom: 20px;
+    font-size: 32px;
+    color: #ff0000; /* Neon red color */
+    text-shadow:
+        0 0 4px #ffffff,
+        0 0 10px #ff0000;
+}
+
+/* Paragraph text */
+.auth-container p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #ffffff;
+    text-shadow: 0 0 4px #ff0000; /* Red glow */
+}
+
+/* Link Styling */
+.auth-container a {
+    color: #ff0000; /* Neon red color */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.auth-container a:hover {
+    color: #ff4d4d; /* Lighter red on hover for subtle effect */
+}
+
+/* The form and its fields */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-form .form-group {
+    width: 100%;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Input Fields Styling */
+.auth-form input[type="text"],
+.auth-form input[type="password"],
+.auth-form input[type="email"] {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid #ff0000; /* Neon red border */
+    border-radius: 8px;
+    background: rgba(255, 0, 0, 0.2); /* Increased red transparency */
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    transition: border 0.3s, box-shadow 0.3s;
+    text-shadow: 0 0 2px #ff0000; /* Red glow */
+}
+
+.auth-form input::placeholder {
+    color: #ffffff;
+    opacity: 0.8;
+    text-shadow: none;
+}
+
+.auth-form input:focus {
+    border: 2px solid #ff4d4d; /* Lighter red on focus */
+    box-shadow: 0 0 10px #ff4d4d;
+    background: rgba(255, 0, 0, 0.3);
+}
+
+/* Submit button */
+.auth-form button {
+    width: 100%;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #ff0000; /* Neon red background */
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow:
+        0 0 5px #ff0000,
+        0 0 10px #ff0000;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.auth-form button:hover {
+    background: #cc0000; /* Darker red on hover */
+    box-shadow:
+        0 0 10px #ff0000,
+        0 0 20px #ff0000;
+}
+
+/* Error messages */
+.errorlist {
+    background: rgba(255, 0, 0, 0.8); /* Red background */
+    color: #fff;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    list-style: none;
+    text-align: left;
+    font-weight: bold;
+    text-shadow: none;
+}
+
+/* Keyframes */
+@keyframes borderGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@media (max-width: 480px) {
+    .auth-container { padding: 30px 20px; }
+    .auth-container h2 { font-size: 28px; }
+    .auth-form button { font-size:16px; padding:10px 16px; }
+}

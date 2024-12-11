@@ -1,0 +1,24 @@
+<!-- your_project/templates/account/signup.html -->
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}Sign Up - Poker Addiction{% endblock %}
+
+{% block content %}
+    <div class="auth-container">
+        <h2>Create Your Account</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form method="POST" class="auth-form" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="form-group">
+                <button type="submit">Sign Up</button>
+            </div>
+        </form>
+        <p>Already have an account? <a href="{% url 'account_login' %}">Log in</a> instead!</p>
+    </div>
+{% endblock %}

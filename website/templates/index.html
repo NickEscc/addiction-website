@@ -1,8 +1,5 @@
-
-
 {% load static %}
 {% comment %} website/template/index.html {% endcomment %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,21 +11,22 @@
     <link href="{% static 'css/bootstrap-slider.min.css' %}" rel="stylesheet" media="screen">
     <link href="{% static 'css/TimeCircles.css' %}" rel="stylesheet" media="screen">
     <link href="{% static 'css/application.css' %}" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 
     <!-- Add any page-specific styles with an extra block if desired -->
     {% block extra_head %}{% endblock %}
 </head>
-{% comment %} <body style="background-color: white;">
-    <!-- Background Video -->
-    <video autoplay muted loop class="background-video">
-        <source src="{% static 'videos/poker_background.mp4' %}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video> {% endcomment %}
-
+<body>
     <!-- Floating Poker Suits -->
     <div class="floating-suits">
         {% for i in "1234567890" %}
-            <span class="{% cycle 'heart' 'diamond' 'club' 'spade' %}" style="left:{{ forloop.counter|add:"5"|add:"%" }}; animation-delay:{{ forloop.counter|add:"1"|add:"s" }};"></span>
+            {% with left_position=forloop.counter|add:5 %}
+                {% with animation_delay=forloop.counter|add:1 %}
+                    <span class="{% cycle 'heart' 'diamond' 'club' 'spade' %}" 
+                          style="left:{{ left_position }}%; animation-delay:{{ animation_delay }}s;">
+                    </span>
+                {% endwith %}
+            {% endwith %}
         {% endfor %}
     </div>
 
