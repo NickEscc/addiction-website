@@ -1,54 +1,69 @@
-# website/views.py
 import uuid
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth import logout
-from .forms import CustomSignupForm
-
+from .forms import CustomSignUpForm
+from django.contrib.auth.models import User
 
 def custom_signup(request):
     if request.method == 'POST':
-        form = CustomSignupForm(request.POST)
+        form = CustomSignUpForm(request.POST)
+
+        # Extract the email from the posted data
+        email = request.POST.get('email')
+        
+        # Check if the email is already in use
+        if email and User.objects.filter(email=email).exists():
+            messages.error(request, 'An account with this email already exists. Please log in.')
+            return redirect('account_login')
+
+        # If the email is not in use, proceed with form validation
         if form.is_valid():
-            user = form.save()
-            login(request, user, backend='allauth.account.auth_backends.AuthenticationBackend')
-            return redirect('home')  # Redirect to home page after signup
+            user = form.save(request)  # Create the user
+            messages.success(request, 'Account created successfully! You can now log in.')
+            return redirect('account_login')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = CustomSignupForm()
+        form = CustomSignUpForm()
+    
     return render(request, 'accounts/signup.html', {'form': form})
 
 def custom_logout(request):
     logout(request)
-    return redirect('home')  # Redirect to home page after logout
+    return redirect('home')
+
 def custom_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')  # Adjust based on your form fields
+        username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')  # Redirect to home page after login
+            return redirect('home')
         else:
             messages.error(request, 'Invalid username or password.')
     return render(request, 'accounts/login.html')
+
 def home(request):
     return render(request, "home.html")
 
 def index(request):
     return render(request, "index.html")
+
 def howtoplay(request):
     return render(request, "website/howtoplay.html")
+
 def chips(request):
     return render(request, "website/chips.html")
+
 def howitworks(request):
     return render(request, "website/howitworks.html")
+
 @login_required(login_url='account_login')
 def join(request):
-    # This view shows the pre-game form and then sets up the session for the game.
     if request.method == 'POST':
         player_name = request.POST.get('name')
         room_id = request.POST.get('room_id') or 'default-room'
@@ -65,8 +80,7 @@ def join(request):
 
         return redirect('game')
     else:
-        # Display the form where users enter name and room ID
-        return render(request, 'website/login.html', {})  # This is your pre-game form page
+        return render(request, 'website/login.html', {})
 
 @login_required(login_url='account_login')
 def game(request):

@@ -143,7 +143,7 @@ STATICFILES_DIRS = [BASE_DIR / "website" / "static"]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Email backend configuration
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 # dj_rest_auth settings

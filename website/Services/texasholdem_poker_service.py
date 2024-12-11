@@ -39,7 +39,7 @@ def initialize_game_server() -> Optional[GameServer]:
         logger.exception(f"Failed to initialize game server: {e}")
         return None
 
-async def start_daphne_server(application, host: str = "127.0.0.1", port: int = 8000):
+async def start_daphne_server(application, host: str = "127.0.0.1", port: int = 8001):
     """
     Starts the Daphne ASGI server.
     """
@@ -79,7 +79,7 @@ async def main():
         sys.exit(1)
 
     # Start Daphne server
-    await start_daphne_server(application, host="127.0.0.1", port=8000)
+    await start_daphne_server(application, host="127.0.0.1", port=8001)
 
 def shutdown(signal_num, frame):
     """

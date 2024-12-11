@@ -42,11 +42,11 @@
 
     <!-- New User Information Box -->
     {% if user.is_authenticated %}
-        <div class="user-info-box">
-            <p><strong>Username:</strong> {{ user.username }}</p>
-            <p><strong>Balance:</strong> ${{ user.userprofile.balance }}</p>
-        </div>
-    {% endif %}
+    <div class="user-info-box">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Balance:</strong> ${{ user.userprofile.balance|default:"0.00" }}</p>
+    </div>
+{% endif %}
 
     <!-- Introductory Text -->
     <div class="intro">
