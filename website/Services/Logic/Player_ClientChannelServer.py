@@ -41,6 +41,7 @@ class PlayerServer(Player):
         self._connected = True
         self._logger = logger or logging.getLogger(__name__)
         self.last_active = asyncio.get_event_loop().time()  # Initialize last active time
+        self._bet_queue = asyncio.Queue()  # Add a queue to store incoming bets
 
     @property
     def connected(self) -> bool:
@@ -58,17 +59,18 @@ class PlayerServer(Player):
             self._logger.error(f"Failed to send message to player {self.id}: {e}")
             self._connected = False
 
-    async def recv_message(self, message, timeout_epoch: Optional[float] = None) -> Any:
-        if not self._connected or self._channel is None:
-            raise ChannelError("Not connected")
+    async def recv_message(self, prompt_message=None, timeout_epoch=None):
+        if prompt_message:
+            await self.send_message(prompt_message)
         try:
+            # This will wait for a JSON message from the channel until the timeout
             if timeout_epoch is not None:
                 timeout = max(0, timeout_epoch - asyncio.get_event_loop().time())
-                message = await asyncio.wait_for(self._channel.receive_json(message), timeout=timeout)
+                message = await asyncio.wait_for(self._channel.get_next_message(), timeout=timeout)
             else:
-                message = await self._channel.receive_json(message)
+                message = await self._channel.get_next_message()
+
             self._logger.debug(f"Message received from player {self.id}: {message}")
-            # Update last_active time whenever a message is received
             self.last_active = asyncio.get_event_loop().time()
             return message
         except asyncio.TimeoutError:

@@ -749,83 +749,83 @@ class GameBetRounder:
     def _get_min_bet(self, dealer: Player, bets: Dict[str, float]) -> float:
         return min(max(bets.values()) - bets[dealer.id], dealer.money)
 
-    # async def bet_round(self, dealer_id: str, bets: Dict[str, float], get_bet_function, on_bet_function=None) -> Optional[Player]:
-    #     players_round = list(self._game_players.round(dealer_id))
-    #     if len(players_round) == 0:
-    #         raise GameError("No active players in this game")
-    #
-    #     dealer = players_round[0]
-    #     for k, player in enumerate(players_round):
-    #         if player.id not in bets:
-    #             bets[player.id] = 0
-    #         if bets[player.id] < 0 or (k > 0 and bets[player.id] < bets[players_round[k - 1].id]):
-    #             raise ValueError("Invalid bets dictionary")
-    #
-    #     best_player = None
-    #     while dealer is not None and dealer != best_player:
-    #         next_player = self._game_players.get_next(dealer.id)
-    #         max_bet = self._get_max_bet(dealer, bets)
-    #         min_bet = self._get_min_bet(dealer, bets)
-    #
-    #         if max_bet == 0.0:
-    #             bet = 0.0
-    #         else:
-    #             bet = await get_bet_function(player=dealer, min_bet=min_bet, max_bet=max_bet, bets=bets)
-    #
-    #         if bet is None:
-    #             self._game_players.remove(dealer.id)
-    #         elif bet == -1:
-    #             self._game_players.fold(dealer.id)
-    #         else:
-    #             if bet < min_bet or bet > max_bet:
-    #                 raise ValueError("Invalid bet")
-    #             dealer.take_money(bet)
-    #             bets[dealer.id] += bet
-    #             if best_player is None or bet > min_bet:
-    #                 best_player = dealer
-    #
-    #         if on_bet_function:
-    #             await on_bet_function(dealer, bet, min_bet, max_bet, bets)
-    #
-    #         dealer = next_player
-    #     return best_player
-
     async def bet_round(self, dealer_id: str, bets: Dict[str, float], get_bet_function, on_bet_function=None) -> Optional[Player]:
         players_round = list(self._game_players.round(dealer_id))
         if len(players_round) == 0:
             raise GameError("No active players in this game")
-
+    
         dealer = players_round[0]
         for k, player in enumerate(players_round):
             if player.id not in bets:
                 bets[player.id] = 0
             if bets[player.id] < 0 or (k > 0 and bets[player.id] < bets[players_round[k - 1].id]):
                 raise ValueError("Invalid bets dictionary")
-
-        for player_id, bet_amount in bets.items():
-            player = self._game_players._players[player_id]
-            if not player:
-                continue
-            max_bet = self._get_max_bet(player, bets)
-            min_bet = self._get_min_bet(player, bets)
-
+    
+        best_player = None
+        while dealer is not None and dealer != best_player:
+            next_player = self._game_players.get_next(dealer.id)
+            max_bet = self._get_max_bet(dealer, bets)
+            min_bet = self._get_min_bet(dealer, bets)
+    
             if max_bet == 0.0:
                 bet = 0.0
             else:
-                bet = await get_bet_function(player=player, min_bet=min_bet, max_bet=max_bet, bets=bets)
-
+                bet = await get_bet_function(player=dealer, min_bet=min_bet, max_bet=max_bet, bets=bets)
+    
             if bet is None:
-                self._game_players.remove(player.id)
+                self._game_players.remove(dealer.id)
             elif bet == -1:
-                self._game_players.fold(player.id)
+                self._game_players.fold(dealer.id)
             else:
                 if bet < min_bet or bet > max_bet:
                     raise ValueError("Invalid bet")
-                player.take_money(bet)
-                # bets[player.id] += bet
+                dealer.take_money(bet)
+                bets[dealer.id] += bet
+                if best_player is None or bet > min_bet:
+                    best_player = dealer
+    
             if on_bet_function:
-                await on_bet_function(player, bet, min_bet, max_bet, bets)
-        return
+                await on_bet_function(dealer, bet, min_bet, max_bet, bets)
+    
+            dealer = next_player
+        return best_player
+
+    # async def bet_round(self, dealer_id: str, bets: Dict[str, float], get_bet_function, on_bet_function=None) -> Optional[Player]:
+    #     players_round = list(self._game_players.round(dealer_id))
+    #     if len(players_round) == 0:
+    #         raise GameError("No active players in this game")
+
+    #     dealer = players_round[0]
+    #     for k, player in enumerate(players_round):
+    #         if player.id not in bets:
+    #             bets[player.id] = 0
+    #         if bets[player.id] < 0 or (k > 0 and bets[player.id] < bets[players_round[k - 1].id]):
+    #             raise ValueError("Invalid bets dictionary")
+
+    #     for player_id, bet_amount in bets.items():
+    #         player = self._game_players._players[player_id]
+    #         if not player:
+    #             continue
+    #         max_bet = self._get_max_bet(player, bets)
+    #         min_bet = self._get_min_bet(player, bets)
+
+    #         if max_bet == 0.0:
+    #             bet = 0.0
+    #         else:
+    #             bet = await get_bet_function(player=player, min_bet=min_bet, max_bet=max_bet, bets=bets)
+
+    #         if bet is None:
+    #             self._game_players.remove(player.id)
+    #         elif bet == -1:
+    #             self._game_players.fold(player.id)
+    #         else:
+    #             if bet < min_bet or bet > max_bet:
+    #                 raise ValueError("Invalid bet")
+    #             player.take_money(bet)
+    #             # bets[player.id] += bet
+    #         if on_bet_function:
+    #             await on_bet_function(player, bet, min_bet, max_bet, bets)
+    #     return
 
 
 class GameBetHandler:
@@ -861,26 +861,23 @@ class GameBetHandler:
         )
         return await self.receive_bet(player, min_bet, max_bet, bets, timeout_epoch)
 
-    async def receive_bet(self, player, min_bet, max_bet, bets, timeout_epoch) -> Optional[int]:
+    async def receive_bet(self, player, min_bet, max_bet, bets, timeout_epoch): 
         try:
-            message = {
-                "message_type": "bet",
-                "bet": bets[player.id],
-            }
-            # message = await player.recv_message(temp_message, timeout_epoch=timeout_epoch)
-            MessageFormatError.validate_message_type(message, "bet")
+            incoming_message = await player.recv_message(None, timeout_epoch=timeout_epoch)
+            MessageFormatError.validate_message_type(incoming_message, "bet")
 
-            if "bet" not in message:
+
+            if "bet" not in incoming_message:
                 raise MessageFormatError(attribute="bet", desc="Attribute is missing")
+            bet_value = float(incoming_message["bet"])
+            bet = round(bet_value)
+            if bet != -1 and (bet < min_bet or bet > max_bet):
+                raise MessageFormatError(
+                    attribute="bet",
+                    desc=f"Bet out of range. min: {min_bet} max: {max_bet}, actual: {bet}"
+            )
+            return bet
 
-            try:
-                bet = round(float(message["bet"]))
-            except ValueError:
-                raise MessageFormatError(attribute="bet", desc=f"'{message['bet']}' is not a number")
-            else:
-                if bet != -1 and (bet < min_bet or bet > max_bet):
-                    raise MessageFormatError(attribute="bet", desc=f"Bet out of range. min: {min_bet} max: {max_bet}, actual: {bet}")
-                return bet
         except (MessageFormatError, asyncio.TimeoutError) as e:
             await player.send_message({"message_type": "error", "error": str(e)})
             return None

@@ -337,7 +337,7 @@ body {
 }
 
 #table #pots .pot {
-    background-image: url('/static/images/cards-50.png');
+    background-image: url('/static/images/chips-small.png'); /* Example replacement */
     background-repeat: no-repeat;
     padding: 15px 0px 10px 40px;
     height: 45px;
@@ -447,4 +447,21 @@ body {
 
 #game-wrapper.texas-holdem #players .player .cards .card {
     margin-left: 0px;
+}
+.btn-custom-blue {
+    background-color: #007BFF; /* Blue color */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom-blue:hover {
+    background-color: #0056b3; /* Darker blue on hover */
 }

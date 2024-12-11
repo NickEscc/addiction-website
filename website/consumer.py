@@ -7,26 +7,34 @@ from channels.db import database_sync_to_async
 from website.Services.Logic.Player_ClientChannelServer import PlayerServer
 from website.Services.Logic.Game_RoomServer import GameRoomFactory
 from website.Services.Logic.Game_server_instance import get_game_server_instance
+import asyncio
 
 logger = logging.getLogger(__name__)
 
 class PokerGameConsumer(AsyncJsonWebsocketConsumer):
     rooms = {}
-
-    async def connect(self):
-        logger.info("WebSocket connection initiated.")
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.incoming_messages = asyncio.Queue()  # Add this line
         self.player_id = None
-        self.session = self.scope['session']
-        await self.accept()
-        logger.info("WebSocket connection accepted.")
-
+        self.session = None
         self.room_id = None
         self.player_server = None
         self.game_room_server = None
         self.player_name = None
         self.player_money = None
         self.room_group_name = None
+        
+    async def connect(self):
+        logger.info("WebSocket connection initiated.")
+        self.session = self.scope['session']
+        await self.accept()
+        logger.info("WebSocket connection accepted.")
 
+        asyncio.create_task(self.process_messages())
+
+        
     async def disconnect(self, close_code):
         player_id = self.player_id if self.player_id else 'Unknown'
         logger.info(f"WebSocket disconnect initiated for player {player_id} with close code {close_code}")
@@ -49,22 +57,31 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def receive_json(self, content, **kwargs):
-        message_type = content.get("message_type")
-        logger.debug(f"Received message: {content}")
+        await self.incoming_messages.put(content)
+        
+    async def get_next_message(self):
+        # Player_ClientChannelServer will wait on this to get the next message
+        message = await self.incoming_messages.get()
+        return message
+    
+    async def process_messages(self):
+        # Continuously process messages from the queue
+        while True:
+            content = await self.get_next_message()
+            message_type = content.get("message_type")
+            logger.debug(f"Processing message: {content}")
 
-        if message_type == 'join':
-            await self.handle_join(content)
-        elif message_type == 'pong' and self.player_server:
-            await self.player_server.handle_pong()
-        elif message_type == 'bet' and self.player_server:
-            await self.player_server.receive_bet(content)
-        elif message_type == 'start-game' and self.player_server:
-            await self.handle_start_game()
-        else:
-            logger.warning(f"Unhandled message type: {message_type}")
-
-        return content
-
+            if message_type == 'join':
+                await self.handle_join(content)
+            elif message_type == 'pong' and self.player_server:
+                await self.player_server.handle_pong()
+            elif message_type == 'bet' and self.player_server:
+                await self.player_server.receive_bet(content)
+            elif message_type == 'start-game' and self.player_server:
+                await self.handle_start_game()
+            else:
+                logger.warning(f"Unhandled message type: {message_type}")
+                
     @database_sync_to_async
     def get_session_value(self, key, default=None):
         return self.session.get(key, default)
@@ -131,8 +148,7 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
         if game_server_instance is None:
             return
 
-        print(game_server_instance)
-        print("Game server rooms", game_server_instance._rooms)
+       
 
         room = next((r for r in game_server_instance._rooms if r.id == self.room_id), None)
         if room:

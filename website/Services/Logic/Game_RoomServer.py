@@ -5,7 +5,7 @@ from typing import List, Dict, Optional
 from uuid import uuid4
 from channels.generic.websocket import AsyncConsumer
 from .Player_ClientChannelServer import PlayerServer
-from .PokerGame import GameFactory, GameSubscriber, GameError, Player, HoldemPokerGameFactory, HoldemPokerGame
+from .PokerGame import GameFactory, GameSubscriber, GameError, Player, HoldemPokerGameFactory
 from .PokerGame import PokerGame, EndGameException, GameError
 
 logger = logging.getLogger(__name__)
@@ -21,14 +21,8 @@ class GameRoom(GameSubscriber):
         self.active = False
         self._game_factory = game_factory
         self._room_size = 10
-        self.current_dealer_index = -1
         self._logger = logger or logging.getLogger(__name__)
         self.players: Dict[str, PlayerServer] = {}
-        self.game = None
-        self.dealer_key = -1
-        self.polled_bets = None
-        self.folded_players = []
-        self.acted_players = set()
         self.start_votes = set()  # Track which players have pressed "Start Game"
 
     async def deactivate(self):
@@ -76,124 +70,36 @@ class GameRoom(GameSubscriber):
         self._logger.info(f"Activating room {self.id}")
         self.active = True
         try:
-            self._logger.debug("Starting a new hand.")
-            await self.remove_inactive_players()
-            if len(self.players) < 2:
-                self._logger.info("Not enough players to continue. Ending the game.")
-                raise GameError("Not enough players to continue")
+            dealer_key = -1
+            while True:
+                self._logger.debug("Starting a new hand.")
+                await self.remove_inactive_players()
+                if len(self.players) < 2:
+                    self._logger.info("Not enough players to continue. Ending the game.")
+                    raise GameError("Not enough players to continue")
 
-            dealer_id = list(self.players.keys())[self.dealer_key]
-            self._logger.info(f"Dealer for this hand is {dealer_id}")
+                dealer_key = (dealer_key + 1) % len(self.players)
+                dealer_id = list(self.players.keys())[dealer_key]
+                self._logger.info(f"Dealer for this hand is {dealer_id}")
 
-            self.game = self._game_factory.create_game(list(self.players.values()))
-
-            if not self.game:
-                self._logger.info("No active game in this room. Ending the game.")
-                raise GameError("No active game in this room.")
-
-            self._logger.debug(f"Game instance: {type(self.game)} with ID {self.game._id}")
-            self.game.event_dispatcher.subscribe(self)
-            self._logger.info("Starting to play hand.")
-            await self.game.play_hand_preflop(dealer_id)
-            self._logger.info("Preflop completed.")
-            self.dealer_key += 1
+                game = self._game_factory.create_game(list(self.players.values()))
+                self._logger.debug(f"Game instance created: {type(game)} with ID {game._id}")
+                game.event_dispatcher.subscribe(self)
+                self._logger.info("Starting to play hand.")
+                await game.play_hand(dealer_id)
+                self._logger.info("Hand completed.")
+                game.event_dispatcher.unsubscribe(self)
 
         except GameError as e:
             self._logger.error(f"Game error in room {self.id}: {e}")
         except Exception as e:
             self._logger.exception(f"Unexpected error in room {self.id}: {e}")
         finally:
-            ...
-            # self._logger.info(f"Deactivating room {self.id}")
-            # self.active = False
-            # # Reset start votes after a round/game ends
-            # self.start_votes.clear()
-            # await self.broadcast_game_over()
-
-    async def play(self, bets):
-        self._logger.info(f"Starting play in room {self.id}")
-        self.active = True
-        try:
-            self._logger.debug(f"Starting {self.game.current_stage}.")
-            await self.remove_inactive_players()
-            if len(self.players) < 2:
-                self._logger.info("Not enough players to continue. Ending the game.")
-                raise GameError("Not enough players to continue")
-
-            dealer_id = list(self.players.keys())[self.dealer_key]
-            self._logger.info(f"Dealer for this hand is {dealer_id}")
-
-            if not self.game:
-                self._logger.info("No active game in this room. Ending the game.")
-                raise GameError("No active game in this room.")
-
-            self._logger.debug(f"Game instance: {type(self.game)} with ID {self.game._id}")
-            # self.game.event_dispatcher.subscribe(self)
-
-            self._logger.info(f"Starting to play {self.game.current_stage} round.")
-            if self.game.current_stage == "flop":
-                await self.game.play_hand_flop(dealer_id, bets)
-            elif self.game.current_stage == "turn":
-                await self.game.play_hand_turn(dealer_id, bets)
-            elif self.game.current_stage == "river":
-                await self.game.play_hand_river(dealer_id, bets)
-                self.game.event_dispatcher.unsubscribe(self)
-            else:
-                raise GameError(f"Unexpected event: {self.game.current_stage}")
-            self.dealer_key += 1
-            self._logger.info(f"{self.game.current_stage} round completed.")
-        except GameError as e:
-            self._logger.error(f"Game error in room {self.id}: {e}")
-        except Exception as e:
-            self._logger.exception(f"Unexpected error in room {self.id}: {e}")
-        finally:
-            if self.game.current_stage == "pre-flop":
-                self._logger.info(f"Deactivating room {self.id}")
-                self.active = False
-                # Reset start votes after a round/game ends
-                self.start_votes.clear()
-                await self.broadcast_game_over()
-
-    async def poll_bets(self, bet_event):
-        try:
-            if not self.game:
-                self._logger.info("Not enough players to continue. Ending the game.")
-                raise GameError("Not enough players to continue")
-
-            player_id = bet_event["player_id"]
-            bet_amount = float(bet_event["bet"])
-
-            if player_id not in self.polled_bets:
-                self.polled_bets[player_id] = 0
-
-            if bet_amount >= 0:
-                self.polled_bets[player_id] += bet_amount
-            else:
-                self.folded_players.append(player_id)
-
-            all_players_have_bet = len(self.players) == len(self.polled_bets)
-            active_players = {
-                player_id: bet_amount
-                for player_id, bet_amount in self.polled_bets.items()
-                if player_id not in self.folded_players
-            }
-
-            if len(active_players) <= 1:
-                betting_complete = True
-            else:
-                first_bet = list(active_players.values())[0]
-                betting_complete = all(
-                    abs(bet_amount - first_bet) < 0.01  # Small tolerance for float comparison
-                    for bet_amount in active_players.values()
-                )
-            if all_players_have_bet and betting_complete:
-                await self.play(self.polled_bets)
-            else:
-                await self.game.handle_bet_event(player_id, self.polled_bets)
-
-
-        except GameError as e:
-            self._logger.error(f"Game error in room {self.id}: {e}")
+            self._logger.info(f"Deactivating room {self.id}")
+            self.active = False
+            # Reset start votes after a round/game ends
+            self.start_votes.clear()
+            await self.broadcast_game_over()
 
     async def remove_inactive_players(self):
         current_time = asyncio.get_event_loop().time()
@@ -211,8 +117,6 @@ class GameRoom(GameSubscriber):
         # Show the button if there are at least 2 players and game not active
         can_start = (len(self.players) >= 2 and not self.active)
         ready_players = list(self.start_votes)
-
-        print([p.dto() for p in self.players.values()])
 
         message = {
             "message_type": "room-update",
