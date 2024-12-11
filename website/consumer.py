@@ -155,19 +155,19 @@ class PokerGameConsumer(AsyncJsonWebsocketConsumer):
         else:
             logger.warning(f"Room {self.room_id} not found while handling start-game.")
 
-    async def handle_bet(self, content):
-        # Mark player as ready for the game to start
-        game_server_instance = get_game_server_instance()
-        if game_server_instance is None:
-            return
+    # async def handle_bet(self, content):
+    #     # Mark player as ready for the game to start
+    #     game_server_instance = get_game_server_instance()
+    #     if game_server_instance is None:
+    #         return
 
-        print("Game server rooms", game_server_instance._rooms)
+    #     print("Game server rooms", game_server_instance._rooms)
 
-        room = next((r for r in game_server_instance._rooms if r.id == self.room_id), None)
-        if room:
-            await room.poll_bets(content)
-        else:
-            logger.warning(f"Room {self.room_id} not found while handling start-game.")
+    #     room = next((r for r in game_server_instance._rooms if r.id == self.room_id), None)
+    #     if room:
+    #         await room.poll_bets(content)
+    #     else:
+    #         logger.warning(f"Room {self.room_id} not found while handling start-game.")
 
     async def add_player_to_room(self):
         if self.room_id not in self.rooms:

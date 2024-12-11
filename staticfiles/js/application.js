@@ -352,35 +352,29 @@ var PyPoker = {
         },
 
         enableBetMode: function(message) {
-            PyPoker.Player.betMode = true;
+           // Always show fold option
+            $('#fold-cmd-wrapper').show();
 
-            if (!message.min_score || $('#current-player').data('allowed-to-bet',true)) {
-                $('#bet-input').slider({
-                    'min': parseInt(message.min_bet),
-                    'max': parseInt(message.max_bet),
-                    'value': parseInt(message.min_bet),
-                    'formatter': PyPoker.Player.sliderHandler
-                }).slider('setValue', parseInt(message.min_bet));
+    // Check the min_bet value to decide which button to show
+            let min_bet = parseInt(message.min_bet);
 
-                if (message.min_score) {
-                    $('#fold-cmd').val('Pass')
-                        .removeClass('btn-danger')
-                        .addClass('btn-warning');
-                } else {
-                    $('#fold-cmd').val('Fold')
-                        .addClass('btn-danger')
-                        .removeClass('btn-warning');
-                }
-
-                $('#fold-cmd-wrapper').show();
+            if (min_bet === 0) {
+        // Player can check (no bet needed)
+                $('#bet-input-wrapper').hide();
+                $('#bet-cmd-wrapper').hide();
+                $('#no-bet-cmd-wrapper').show();  // Show "No Bet" (Check) button
+                $('#bet-cmd').text("Check");      // Label bet-cmd as "Check"
+            } else {
+        // Player must place a bet if they want to stay in the game
                 $('#bet-input-wrapper').show();
                 $('#bet-cmd-wrapper').show();
                 $('#no-bet-cmd-wrapper').hide();
-            } else {
-                $('#fold-cmd-wrapper').hide();
-                $('#bet-input-wrapper').hide();
-                $('#bet-cmd-wrapper').hide();
-                $('#no-bet-cmd-wrapper').show();
+
+        // Update bet slider min and max based on message data if needed
+        // This ensures the player can select a valid bet amount
+                $('#bet-input').slider('setAttribute', 'min', min_bet);
+                $('#bet-input').slider('setValue', min_bet);
+                $('#bet-cmd').text("$" + min_bet);
             }
 
             $('#bet-controls').show();
@@ -742,5 +736,12 @@ window.addEventListener('beforeunload', function() {
 
 $(document).ready(function() {
     if ($('#game-wrapper').length)
+        $('#bet-input').slider({
+            min: 0,
+            max: 1000,
+            step: 1,
+            value: 0,
+            formatter: PyPoker.Player.sliderHandler
+        });
         PyPoker.init();
 });

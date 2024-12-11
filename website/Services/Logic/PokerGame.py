@@ -997,6 +997,8 @@ class PokerGame:
 
 
 class HoldemPokerGameEventDispatcher(GameEventDispatcher):
+    
+    
     async def new_game_event(self, game_id, players, dealer_id, big_blind, small_blind):
         await self.raise_event(
             "new-game",
@@ -1036,7 +1038,15 @@ class HoldemPokerGame(PokerGame):
         self.deck = None
         self.current_stage = "pre-flop"
         self._logger = logger or logging.getLogger(__name__)
-
+    def _next_active_player_id(self, reference_id):
+        active_players = list(self._game_players.round(reference_id))
+        if len(active_players) < 2:
+        # If there's only one player or none, no next player
+        # This could raise an error or return reference_id
+            return reference_id
+    # The first player in round(reference_id) is reference_id player, so next is active_players[1]
+        return active_players[1].id
+    
     async def _add_shared_cards(self, new_shared_cards, scores):
         await self._event_dispatcher.shared_cards_event(new_shared_cards)
         scores.add_shared_cards(new_shared_cards)
@@ -1221,26 +1231,36 @@ class HoldemPokerGame(PokerGame):
             await self._assign_cards(2, dealer_id, deck, scores)
             self._logger.info("Pre-flop cards assigned.")
 
+            bb_player_id = list(self._game_players.round(dealer_id))[-1].id  # Big blind is last in round(dealer_id)
+            start_player_id = self._next_active_player_id(bb_player_id)
             await self._bet_handler.bet_round(dealer_id, bets, pots)
             self._logger.info("Pre-flop betting round completed.")
 
 
             # Flop
+            
             await self._add_shared_cards(deck.pop_cards(3), scores)
             self._logger.info("Flop cards added.")
-
+            
+            
+            start_player_id = self._next_active_player_id(dealer_id)
+            
             await self._bet_handler.bet_round(dealer_id, {}, pots)
             self._logger.info("Flop betting round completed.")
 
             # Turn
             await self._add_shared_cards(deck.pop_cards(1), scores)
             self._logger.info("Turn card added.")
+            
+            start_player_id = self._next_active_player_id(dealer_id)
             await self._bet_handler.bet_round(dealer_id, {}, pots)
             self._logger.info("Turn betting round completed.")
 
             # River
             await self._add_shared_cards(deck.pop_cards(1), scores)
             self._logger.info("River card added.")
+            
+            start_player_id = self._next_active_player_id(dealer_id)
             await self._bet_handler.bet_round(dealer_id, {}, pots)
             self._logger.info("River betting round completed.")
 
