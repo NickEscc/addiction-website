@@ -776,12 +776,12 @@ class GameBetRounder:
                 self._game_players.fold(current_player.id)
                 if self._game_players.count_active() < 2:
     # Either break to stop the betting round:
-                    break
+                    return
             elif bet == -1:
                 self._game_players.fold(current_player.id)
                 if self._game_players.count_active() < 2:
     # Either break to stop the betting round:
-                    break
+                    return
             else:
                 if bet < min_bet or bet > max_bet:
                     raise ValueError("Invalid bet")
