@@ -10,7 +10,8 @@ def index(request):
     return render(request, "index.html")
 def howtoplay(request):
     return render(request, "website/howtoplay.html")
-
+def chips(request):
+    return render(request, "website/chips.html")
 def howitworks(request):
     return render(request, "website/howitworks.html")
 @login_required(login_url='account_login')

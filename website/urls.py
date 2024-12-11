@@ -11,4 +11,6 @@ urlpatterns = [
     path('game/', views.game, name='game'),
      path('howtoplay/', views.howtoplay, name='howtoplay'),
     path('howitworks/', views.howitworks, name='howitworks'),
+     path('chips/', views.chips, name='chips'),
+
 ]
