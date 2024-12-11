@@ -368,31 +368,60 @@ var PyPoker = {
 
         enableBetMode: function(message) {
            // Always show fold option
-            $('#fold-cmd-wrapper').show();
+           $('#fold-cmd-wrapper').show();
 
-    // Check the min_bet value to decide which button to show
-            let min_bet = parseInt(message.min_bet);
-
-            if (min_bet === 0) {
-        // Player can check (no bet needed)
-                $('#bet-input-wrapper').hide();
-                $('#bet-cmd-wrapper').hide();
-                $('#no-bet-cmd-wrapper').show();  // Show "No Bet" (Check) button
-                $('#bet-cmd').text("Check");      // Label bet-cmd as "Check"
-            } else {
-        // Player must place a bet if they want to stay in the game
-                $('#bet-input-wrapper').show();
-                $('#bet-cmd-wrapper').show();
-                $('#no-bet-cmd-wrapper').hide();
-
-        // Update bet slider min and max based on message data if needed
-        // This ensures the player can select a valid bet amount
-                $('#bet-input').slider('setAttribute', 'min', min_bet);
-                $('#bet-input').slider('setValue', min_bet);
-                $('#bet-cmd').text("$" + min_bet);
-            }
-
-            $('#bet-controls').show();
+           let min_bet = parseInt(message.min_bet);
+           let max_bet = parseInt(message.max_bet);
+       
+           if (min_bet === 0) {
+               // Player can choose to Check or Bet (Raise)
+               $('#bet-input-wrapper').show();   // Show the slider for selecting a bet amount
+               $('#bet-cmd-wrapper').show();     // Show the Bet button
+               $('#no-bet-cmd-wrapper').show();  // Show "Check" button
+       
+               // Initialize the slider to 0 (Check)
+               $('#bet-input').slider('setAttribute', 'min', 0);
+               $('#bet-input').slider('setAttribute', 'max', max_bet);
+               $('#bet-input').slider('setValue', 0);
+       
+               // Label the Bet button as "Check" when slider is at 0
+               $('#bet-cmd').text("Check");
+       
+               // Update the Bet button label based on slider value
+               $('#bet-input').on('slideStop', function(event) {
+                   let value = $('#bet-input').slider('getValue');
+                   if (value === 0) {
+                       $('#bet-cmd').text("Check");
+                   } else {
+                       $('#bet-cmd').text("Bet $" + value);
+                   }
+               });
+           } else {
+               // Player must Call or Raise
+               $('#bet-input-wrapper').show();
+               $('#bet-cmd-wrapper').show();
+               $('#no-bet-cmd-wrapper').hide();   // Hide "Check" button when min_bet > 0
+       
+               // Set the slider to the min_bet and allow raising up to max_bet
+               $('#bet-input').slider('setAttribute', 'min', min_bet);
+               $('#bet-input').slider('setAttribute', 'max', max_bet);
+               $('#bet-input').slider('setValue', min_bet);
+       
+               // Label the Bet button as "Call" when slider is at min_bet
+               $('#bet-cmd').text("Call $" + min_bet);
+       
+               // Update the Bet button label based on slider value
+               $('#bet-input').on('slideStop', function(event) {
+                   let value = $('#bet-input').slider('getValue');
+                   if (value === min_bet) {
+                       $('#bet-cmd').text("Call $" + min_bet);
+                   } else {
+                       $('#bet-cmd').text("Raise $" + value);
+                   }
+               });
+           }
+       
+           $('#bet-controls').show();
         },
 
         disableBetMode: function() {

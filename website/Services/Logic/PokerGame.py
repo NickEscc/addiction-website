@@ -773,9 +773,15 @@ class GameBetRounder:
                 bet = await get_bet_function(player=current_player, min_bet=min_bet, max_bet=max_bet, bets=bets)
     
             if bet is None:
-                self._game_players.remove(current_player.id)
+                self._game_players.fold(current_player.id)
+                if self._game_players.count_active() < 2:
+    # Either break to stop the betting round:
+                    break
             elif bet == -1:
                 self._game_players.fold(current_player.id)
+                if self._game_players.count_active() < 2:
+    # Either break to stop the betting round:
+                    break
             else:
                 if bet < min_bet or bet > max_bet:
                     raise ValueError("Invalid bet")
