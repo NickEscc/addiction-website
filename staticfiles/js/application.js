@@ -9,6 +9,19 @@ var PyPoker = {
         numCards: null,
         scoreCategories: null,
 
+        showWinner: function(pot, players) {
+            let winnerIds = pot.winner_ids;
+            let winnerNames = winnerIds.map(id => players[id].name);
+            let winnerMessage = "Winner(s): " + winnerNames.join(", ");
+            PyPoker.Logger.log(winnerMessage);
+        
+            // Highlight the winning player(s)
+            winnerIds.forEach(wid => {
+                $('#players .player[data-player-id="' + wid + '"]').addClass('winner');
+            });
+        
+            // Do not hide start game here. The 'game-over' event will show Start Game again.
+        },
         getCurrentPlayerId: function() {
             return $('#current-player').attr('data-player-id');
         },
@@ -233,7 +246,6 @@ var PyPoker = {
             $('#shared-cards').empty();
             $('#players .player .bet-wrapper').empty();
             $('#current-player').hide();
-            $('#start-game-wrapper').hide(); // Hide Start Game button after winners are set
         },
 
         changeCards: function(player, numCards) {
@@ -255,8 +267,11 @@ var PyPoker = {
                     PyPoker.Game.updateCurrentPlayerCards(message.cards, message.score);
                     break;
                 case 'game-over':
-                    // PyPoker.Player.resetControls();
+                    PyPoker.Player.resetControls();
                     PyPoker.Game.gameOver();
+                    // Show the Start Game button again:
+                    $('#start-game-wrapper').show();
+                    $('#start-game-cmd').prop('disabled', false).text('Start Game');
                     break;
                 case 'fold':
                     // PyPoker.Player.resetControls();
@@ -292,7 +307,7 @@ var PyPoker = {
                     PyPoker.Player.resetControls();
                     PyPoker.Game.updatePlayers(message.players);
                     PyPoker.Game.updatePots(message.pots);
-                    PyPoker.Game.setWinners(message.pot);
+                    PyPoker.Game.showWinner(message.pot, message.players);
                     break;
                 case 'showdown':
                     PyPoker.Player.resetControls();

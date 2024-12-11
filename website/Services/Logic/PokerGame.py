@@ -762,33 +762,30 @@ class GameBetRounder:
                 raise ValueError("Invalid bets dictionary")
     
         best_player = None
-        while dealer is not None and dealer != best_player:
-            next_player = self._game_players.get_next(dealer.id)
-            max_bet = self._get_max_bet(dealer, bets)
-            min_bet = self._get_min_bet(dealer, bets)
+        for current_player in players_round:
+            max_bet = self._get_max_bet(current_player, bets)
+            min_bet = self._get_min_bet(current_player, bets)
+
     
             if max_bet == 0.0:
                 bet = 0.0
             else:
-                bet = await get_bet_function(player=dealer, min_bet=min_bet, max_bet=max_bet, bets=bets)
+                bet = await get_bet_function(player=current_player, min_bet=min_bet, max_bet=max_bet, bets=bets)
     
             if bet is None:
-                self._game_players.remove(dealer.id)
+                self._game_players.remove(current_player.id)
             elif bet == -1:
-                self._game_players.fold(dealer.id)
+                self._game_players.fold(current_player.id)
             else:
                 if bet < min_bet or bet > max_bet:
                     raise ValueError("Invalid bet")
-                dealer.take_money(bet)
-                bets[dealer.id] += bet
-                if best_player is None or bet > min_bet:
-                    best_player = dealer
+                current_player.take_money(bet)
+                bets[current_player.id] += bet
+              
     
             if on_bet_function:
                 await on_bet_function(dealer, bet, min_bet, max_bet, bets)
     
-            dealer = next_player
-        return best_player
 
     # async def bet_round(self, dealer_id: str, bets: Dict[str, float], get_bet_function, on_bet_function=None) -> Optional[Player]:
     #     players_round = list(self._game_players.round(dealer_id))

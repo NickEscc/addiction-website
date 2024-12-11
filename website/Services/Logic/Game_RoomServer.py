@@ -71,25 +71,23 @@ class GameRoom(GameSubscriber):
         self._logger.info(f"Activating room {self.id}")
         self.active = True
         try:
-            dealer_key = -1
-            while True:
-                self._logger.debug("Starting a new hand.")
-                await self.remove_inactive_players()
-                if len(self.players) < 2:
-                    self._logger.info("Not enough players to continue. Ending the game.")
-                    raise GameError("Not enough players to continue")
+            self._logger.debug("Starting a new hand.")
+            await self.remove_inactive_players()
+            if len(self.players) < 2:
+                self._logger.info("Not enough players to continue. Ending the game.")
+                raise GameError("Not enough players to continue")
 
-                dealer_key = (dealer_key + 1) % len(self.players)
-                dealer_id = list(self.players.keys())[dealer_key]
-                self._logger.info(f"Dealer for this hand is {dealer_id}")
+            dealer_key = 0
+            dealer_id = list(self.players.keys())[dealer_key]
+            self._logger.info(f"Dealer for this hand is {dealer_id}")
 
-                game = self._game_factory.create_game(list(self.players.values()))
-                self._logger.debug(f"Game instance created: {type(game)} with ID {game._id}")
-                game.event_dispatcher.subscribe(self)
-                self._logger.info("Starting to play hand.")
-                await game.play_hand(dealer_id)
-                self._logger.info("Hand completed.")
-                game.event_dispatcher.unsubscribe(self)
+            game = self._game_factory.create_game(list(self.players.values()))
+            self._logger.debug(f"Game instance created: {type(game)} with ID {game._id}")
+            game.event_dispatcher.subscribe(self)
+            self._logger.info("Starting to play hand.")
+            await game.play_hand(dealer_id)
+            self._logger.info("Hand completed.")
+            game.event_dispatcher.unsubscribe(self)
 
         except GameError as e:
             self._logger.error(f"Game error in room {self.id}: {e}")
@@ -101,6 +99,7 @@ class GameRoom(GameSubscriber):
             # Reset start votes after a round/game ends
             self.start_votes.clear()
             await self.broadcast_game_over()
+            return
 
     async def remove_inactive_players(self):
         current_time = asyncio.get_event_loop().time()
